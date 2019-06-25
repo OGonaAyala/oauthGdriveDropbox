@@ -1,18 +1,15 @@
 import React, { Component } from "react";
 import "../App.css";
 import ListFiles from "../components/listFiles";
+import { getFilesGoogle, deleteFilesGoogle, uploadFilesGoogle, downloadFilesGoogle } from '../actions/actions';
+import { connect } from 'react-redux';
 
 class Google extends Component {
   constructor(){
-    super();
+     super();
     this.state = {
-      token: '',
-      loading: false,
-      errors: null,
-      files: []
+      token: ''
     };
-    this.handleDelete = this.handleDelete.bind(this);
-    this.handleDownload = this.handleDownload.bind(this);
   }
 
   getTokenFromURL(str){
@@ -41,6 +38,14 @@ class Google extends Component {
     return ret;
   }
 
+  uploadFile(){
+    const fileInput = document.getElementById('file-upload');
+    const file = fileInput.files[0];
+    const token = this.state.token;
+    const data = {file, token};
+    this.props.uploadFilesGoogle(data);
+  }
+
    componentWillMount(){
     var query = this.getTokenFromURL(window.location.hash).token;
      this.setState({
@@ -49,98 +54,11 @@ class Google extends Component {
    }
 
    componentDidMount(){
-    fetch('https://www.googleapis.com/drive/v3/files',{
-      method: 'GET',
-      headers: {'Authorization':  `Bearer ${this.state.token}`}
-    })
-    .then(response => response.json())
-    .then(jsonResponse => {
-     console.log(jsonResponse.files);
-     return jsonResponse.files;
-    })
-    .then((files) => {
-      this.setState({
-        files:files
-      })
-    })
-    .catch(function(error) {
-      console.error(error);
-    });
+    this.props.getFilesGoogle(this.state.token);
   }
 
-  uploadFile(){
-    const fileInput = document.getElementById('file-upload');
-    const file = fileInput.files[0];
-    const data = file;
-    fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=media',{
-      method: 'POST',
-      headers: {
-        'Content-Type': file.type,
-        'Content-Lenght': file.size,
-        'Authorization':  `Bearer ${this.state.token}`
-      },
-      body: data
-    })
-    .then(function(response) {
-      console.log(response);
-    })
-    .catch(function(error) {
-      console.error(error);
-    });
-  }
-
-  handleDownload(id){
-      this.setState({
-      errors: null,
-      loading: true,
-    }, () => {
-     fetch( `https://www.googleapis.com/drive/v3/files/${id.id}?alt=media`,{
-      method: 'GET',
-      headers: {
-                'Authorization':  `Bearer ${this.state.token}`,
-      }
-    })
-     .then((response) => response.blob())
-      .then((blob) => {
-        const url = window.URL.createObjectURL(new Blob([blob]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `${id.id}.pdf`);
-        document.body.appendChild(link);
-        link.click();
-        link.parentNode.removeChild(link);
-        this.setState({
-          loading: false
-        });
-      })
-      .catch((error) => {
-        error.json().then((json) => {
-          this.setState({
-            errors: json,
-            loading: false
-          });
-        })
-      });
-    }); 
-  }
-
-  handleDelete(id){
-     fetch(`https://www.googleapis.com/drive/v3/files/${id.id}`,{
-      method: 'DELETE',
-      headers: {
-                'Authorization':  `Bearer ${this.state.token}`,
-                }
-    })
-   .then(function(response) {
-      console.log(response);
-    })
-    .catch(function(error) {
-      console.error(error);
-    });
-    }
-      
   render() {
-    const files = this.state.files;
+    const files = this.props.files;
 
     return (
       <div>
@@ -150,8 +68,10 @@ class Google extends Component {
               <ListFiles
               key={file.id}
               {...file}
-              delete = {this.handleDelete}
-              download = {this.handleDownload}/>
+              token = {this.state.token}
+              delete = {this.props.deleteFilesGoogle}
+              download = {this.props.downloadFilesGoogle}
+             />
               )
           }
         </div>
@@ -167,4 +87,11 @@ class Google extends Component {
   }
 }
 
-export default Google;
+export default connect(
+    (state) => ({
+        files: state.google.files
+    }),
+    {
+        getFilesGoogle, deleteFilesGoogle, uploadFilesGoogle, downloadFilesGoogle    
+    }
+)(Google);

@@ -6,7 +6,8 @@ class ListFiles extends Component {
   handleDelete() {
     const id = this.props.id;
     const name = this.props.name;
-    const param = {id, name};
+    const token = this.props.token
+    const param = {id, name, token};
     this.props.delete(param);
     }
 
@@ -14,7 +15,8 @@ class ListFiles extends Component {
     const id = this.props.id;
     const name = this.props.name;
     const type = this.props.mimeType;
-    const param = {id, name, type};
+    const token = this.props.token;
+    const param = {id, name, type, token};
     this.props.download(param);
   }
 
