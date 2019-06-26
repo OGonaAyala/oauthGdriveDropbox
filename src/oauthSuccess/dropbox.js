@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import "../App.css";
 import ListFiles from "../components/listFiles";
 import { connect } from 'react-redux';
-import { getFilesDropbox, deleteFilesDropbox, downloadFilesDropbox } from '../actions/actions';
+import { getFilesDropbox, deleteFilesDropbox, downloadFilesDropbox, uploadFileDropbox } from '../actions/actions';
 
 class Dropbox extends Component {
   constructor(){
@@ -50,6 +50,14 @@ class Dropbox extends Component {
     this.props.getFilesDropbox(this.state.token);
   }
 
+   uploadFile(){
+    const fileInput = document.getElementById('file-upload');
+    const file = fileInput.files[0];
+    const token = this.state.token;
+    const data = {file, token};
+    this.props.uploadFileDropbox(data);
+  }
+
   render() {
     const files = this.props.files;
     return (
@@ -67,6 +75,13 @@ class Dropbox extends Component {
             />
         )}
         </div>
+          <div>
+        <h2>Subir archivo</h2>
+          <form onSubmit={this.uploadFile.bind(this)}>
+           <input type="file" id="file-upload" />
+           <button type="submit">Submit</button>
+          </form>
+        </div>
       </div> 
     );
   }
@@ -77,6 +92,6 @@ export default connect(
         files: state.google.files
     }),
     {
-        getFilesDropbox, deleteFilesDropbox, downloadFilesDropbox
+        getFilesDropbox, deleteFilesDropbox, downloadFilesDropbox, uploadFileDropbox
     }
 )(Dropbox);

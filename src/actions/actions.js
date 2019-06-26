@@ -100,3 +100,16 @@ export const downloadFilesDropbox = (id) =>{
       })
   }
 };
+
+export const uploadFileDropbox = (data) =>{
+    return (dispatch) => {
+    const dbx = new Dropbox({ accessToken: data.token});
+        dbx.filesUpload({path: '/Imagenes/' + data.file.name, contents: data.file})
+        .then(function(response) {
+      console.log(response);
+            })
+            .catch(res => {
+                console.log(res);
+            })
+  }
+};
