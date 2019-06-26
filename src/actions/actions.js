@@ -1,5 +1,6 @@
 import { GET_FILES } from '../constants/constants';
 import { googleGet, googleDelete, googleUpload, googleDownload } from '../libs/api';
+const Dropbox = require('dropbox').Dropbox;
 
 const getFiles = (files) => ({type: GET_FILES, payload: files});
 
@@ -51,6 +52,19 @@ export const downloadFilesGoogle = (id) =>{
         link.click();
         link.parentNode.removeChild(link);
         console.log(link);
+      })
+      .catch(res => {
+        console.log(res);
+      })
+  }
+};
+
+export const getFilesDropbox = (token) => {
+  return (dispatch) => {
+    var dbx = new Dropbox({ accessToken: token});
+    dbx.filesListFolder({path: '/Imagenes'})
+      .then(res => {
+        dispatch(getFiles(res.entries));
       })
       .catch(res => {
         console.log(res);
