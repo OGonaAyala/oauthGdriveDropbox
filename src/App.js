@@ -1,38 +1,39 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import './App.css';
 const Dropbox = require('dropbox').Dropbox;
 
 class App extends Component {
-
-  constructor(){
+  constructor() {
     super();
     this.state = {
-       url: ''
+      url: '',
     };
   }
 
-  componentWillMount(){
+  componentWillMount() {
     const CLIENT_ID = 'aqqk12j05filjea';
     const dbx = new Dropbox({ clientId: CLIENT_ID });
-    const authUrl = dbx.getAuthenticationUrl('http://localhost:3000/dropboxSucces');
+    const authUrl = dbx.getAuthenticationUrl(
+      'http://localhost:3000/dropboxSucces',
+    );
     this.setState({
-      url:authUrl
-    })
+      url: authUrl,
+    });
   }
 
-  render(){
-    console.log(this.state.url)
+  render() {
+    console.log(this.state.url);
     return (
-    <div className="App">
-      <a href="http://localhost:4500/auth/google" className="button">
-        <div>
-          <span className="svgIcon t-popup-svg">
-            <svg
-              className="svgIcon-use"
-              width="25"
-              height="37"
-              viewBox="0 0 25 25"
-            >
+      <div className="App">
+        <a href="http://localhost:4500/auth/google" className="button">
+          <div>
+            <span className="svgIcon t-popup-svg">
+              <svg
+                className="svgIcon-use"
+                width="25"
+                height="37"
+                viewBox="0 0 25 25"
+              >
                 <g fill="none" fillRule="evenodd">
                   <path
                     d="M20.66 12.693c0-.603-.054-1.182-.155-1.738H12.5v3.287h4.575a3.91 3.91 0 0 1-1.697 2.566v2.133h2.747c1.608-1.48 2.535-3.65 2.535-6.24z"
@@ -53,13 +54,15 @@ class App extends Component {
                 </g>
               </svg>
             </span>
-           <span className="button-label">Iniciar sesion con Google</span>
-        </div>
-      </a>
-      <a href={this.state.url} onClick={this.handleClick}  className="button">Dropbox Authenticate</a>
-    </div>
-  );
+            <span className="button-label">Iniciar sesion con Google</span>
+          </div>
+        </a>
+        <a href={this.state.url} onClick={this.handleClick} className="button">
+          Dropbox Authenticate
+        </a>
+      </div>
+    );
   }
 }
-  
+
 export default App;

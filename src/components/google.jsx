@@ -1,18 +1,23 @@
-import React, { Component } from "react";
-import "../App.css";
-import ListFiles from "../components/listFiles";
-import { getFilesGoogle, deleteFilesGoogle, uploadFilesGoogle, downloadFilesGoogle } from '../actions/actions';
+import React, { Component } from 'react';
+import '../App.css';
+import ListFiles from '../components/listFiles.jsx';
+import {
+  getFilesGoogle,
+  deleteFilesGoogle,
+  uploadFilesGoogle,
+  downloadFilesGoogle,
+} from '../actions/actions';
 import { connect } from 'react-redux';
 
 class Google extends Component {
-  constructor(){
-     super();
+  constructor() {
+    super();
     this.state = {
-      token: ''
+      token: '',
     };
   }
 
-  getTokenFromURL(str){
+  getTokenFromURL(str) {
     var ret = Object.create(null);
     if (typeof str !== 'string') {
       return ret;
@@ -21,7 +26,7 @@ class Google extends Component {
     if (!str) {
       return ret;
     }
-    str.split('&').forEach(function (param) {
+    str.split('&').forEach(function(param) {
       var parts = param.replace(/\+/g, ' ').split('=');
       var key = parts.shift();
       var val = parts.length > 0 ? parts.join('=') : undefined;
@@ -38,22 +43,22 @@ class Google extends Component {
     return ret;
   }
 
-  uploadFile(){
+  uploadFile() {
     const fileInput = document.getElementById('file-upload');
     const file = fileInput.files[0];
     const token = this.state.token;
-    const data = {file, token};
+    const data = { file, token };
     this.props.uploadFilesGoogle(data);
   }
 
-   componentWillMount(){
+  componentWillMount() {
     var query = this.getTokenFromURL(window.location.hash).token;
-     this.setState({
-      token: query
-     });
-   }
+    this.setState({
+      token: query,
+    });
+  }
 
-   componentDidMount(){
+  componentDidMount() {
     this.props.getFilesGoogle(this.state.token);
   }
 
@@ -63,23 +68,21 @@ class Google extends Component {
     return (
       <div>
         <div>
-          {
-            files.map(file => 
-              <ListFiles
+          {files.map(file => (
+            <ListFiles
               key={file.id}
               {...file}
-              token = {this.state.token}
-              delete = {this.props.deleteFilesGoogle}
-              download = {this.props.downloadFilesGoogle}
-             />
-              )
-          }
+              token={this.state.token}
+              delete={this.props.deleteFilesGoogle}
+              download={this.props.downloadFilesGoogle}
+            />
+          ))}
         </div>
         <div>
-        <h2>Subir archivo</h2>
+          <h2>Subir archivo</h2>
           <form onSubmit={this.uploadFile.bind(this)}>
-           <input type="file" id="file-upload" />
-           <button type="submit">Submit</button>
+            <input type="file" id="file-upload" />
+            <button type="submit">Submit</button>
           </form>
         </div>
       </div>
@@ -88,10 +91,13 @@ class Google extends Component {
 }
 
 export default connect(
-    (state) => ({
-        files: state.google.files
-    }),
-    {
-        getFilesGoogle, deleteFilesGoogle, uploadFilesGoogle, downloadFilesGoogle    
-    }
+  state => ({
+    files: state.google.files,
+  }),
+  {
+    getFilesGoogle,
+    deleteFilesGoogle,
+    uploadFilesGoogle,
+    downloadFilesGoogle,
+  },
 )(Google);

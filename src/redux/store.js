@@ -2,12 +2,8 @@ import { createStore, applyMiddleware, combineReducers } from 'redux';
 import thunk from 'redux-thunk';
 import googleReducer from './reducers/googleReducer';
 
-
 const mainReducer = combineReducers({
-    google: googleReducer
+  google: googleReducer,
 });
 
-export default createStore(
-    mainReducer,
-    applyMiddleware(thunk)
-);
+export default createStore(mainReducer, applyMiddleware(thunk));
