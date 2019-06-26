@@ -7,8 +7,8 @@ import {
   dropboxDelete,
   dropboxDownload,
 } from '../libs/api';
-const Dropbox = require('dropbox').Dropbox;
 
+const Dropbox = require('dropbox').Dropbox;
 const getFiles = files => ({ type: GET_FILES, payload: files });
 
 export const getFilesGoogle = token => {

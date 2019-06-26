@@ -1,9 +1,9 @@
 import { createStore, applyMiddleware, combineReducers } from 'redux';
 import thunk from 'redux-thunk';
-import googleReducer from './reducers/googleReducer';
+import filesReducer from './reducers/filesReducer';
 
 const mainReducer = combineReducers({
-  google: googleReducer,
+  filesReducer: filesReducer,
 });
 
 export default createStore(mainReducer, applyMiddleware(thunk));

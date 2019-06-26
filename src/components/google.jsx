@@ -92,7 +92,7 @@ class Google extends Component {
 
 export default connect(
   state => ({
-    files: state.google.files,
+    files: state.filesReducer.files,
   }),
   {
     getFilesGoogle,
