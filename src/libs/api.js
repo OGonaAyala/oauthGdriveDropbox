@@ -51,3 +51,16 @@ export const googleDownload = (id) => {
 };
 
 
+export const dropboxDelete = (id) => {
+    const data = {path: `/Imagenes/${id.name}`};
+    const url = 'https://api.dropboxapi.com/2/files/delete_v2';
+    const request = {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+           'Authorization':  `Bearer ${id.token}`,
+           'Content-Type': 'application/json'
+        }
+    };
+    return fetch(url, request)
+};

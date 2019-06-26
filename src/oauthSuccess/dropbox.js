@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import "../App.css";
 import ListFiles from "../components/listFiles";
 import { connect } from 'react-redux';
-import { getFilesDropbox } from '../actions/actions'
+import { getFilesDropbox, deleteFilesDropbox } from '../actions/actions'
 const Dropboxx = require('dropbox').Dropbox;
 
 class Dropbox extends Component {
@@ -61,8 +61,9 @@ class Dropbox extends Component {
           files.map(file =>
             <ListFiles
             key = {file.id}
+            token = {this.state.token}
             {...file}
-            //delete = {this.handleDelete} 
+            delete = {this.props.deleteFilesDropbox} 
             //download = {this.handleDownload}
             />
         )}
@@ -77,6 +78,6 @@ export default connect(
         files: state.google.files
     }),
     {
-        getFilesDropbox
+        getFilesDropbox, deleteFilesDropbox
     }
 )(Dropbox);

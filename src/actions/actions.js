@@ -1,5 +1,5 @@
 import { GET_FILES } from '../constants/constants';
-import { googleGet, googleDelete, googleUpload, googleDownload } from '../libs/api';
+import { googleGet, googleDelete, googleUpload, googleDownload, dropboxDelete } from '../libs/api';
 const Dropbox = require('dropbox').Dropbox;
 
 const getFiles = (files) => ({type: GET_FILES, payload: files});
@@ -70,4 +70,13 @@ export const getFilesDropbox = (token) => {
         console.log(res);
       })
   }
+};
+
+export const deleteFilesDropbox = (id) => {
+   return (dispatch) => {
+        dropboxDelete(id)
+           .then(res => res.json())
+    .catch(error => console.error('Error:', error))
+    .then(response => console.log('Success:', response));
+    }
 };
