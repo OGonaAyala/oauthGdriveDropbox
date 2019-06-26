@@ -1,5 +1,5 @@
 import { GET_FILES } from '../constants/constants';
-import { googleGet, googleDelete, googleUpload, googleDownload, dropboxDelete } from '../libs/api';
+import { googleGet, googleDelete, googleUpload, googleDownload, dropboxDelete, dropboxDownload } from '../libs/api';
 const Dropbox = require('dropbox').Dropbox;
 
 const getFiles = (files) => ({type: GET_FILES, payload: files});
@@ -79,4 +79,24 @@ export const deleteFilesDropbox = (id) => {
     .catch(error => console.error('Error:', error))
     .then(response => console.log('Success:', response));
     }
+};
+
+export const downloadFilesDropbox = (id) =>{
+  return (dispatch) => {
+    dropboxDownload(id)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', id.name);
+        document.body.appendChild(link);
+        link.click();
+        link.parentNode.removeChild(link);
+        console.log(link);
+      })
+      .catch(res => {
+        console.log(res);
+      })
+  }
 };

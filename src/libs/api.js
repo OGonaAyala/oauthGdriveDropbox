@@ -64,3 +64,16 @@ export const dropboxDelete = (id) => {
     };
     return fetch(url, request)
 };
+
+export const dropboxDownload = (id) => {
+  const data = {path: `/Imagenes/${id.name}`}
+  const url = 'https://content.dropboxapi.com/2/files/download';
+  const request = {
+    method:'POST',
+    headers: {
+       'Authorization':  `Bearer ${id.token}`,
+       'Dropbox-API-Arg': JSON.stringify(data)
+    }
+  };
+   return fetch(url, request)
+};
