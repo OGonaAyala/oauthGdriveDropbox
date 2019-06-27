@@ -58,6 +58,27 @@ class Google extends Component {
     });
   }
 
+  handleGetNew(){
+    
+      const client_id = "1011461723910-5l7nmlhno2me1ahd5jksfc4ti96n35ua.apps.googleusercontent.com";
+      const client_secret = "B88yPjs8m-sQeiapqnK-fWDz";
+      const refresh_token =  '1/Q_9Uq5ola04IBBYVRxDKZzPI2MYriMbpIXKZ2bQLvH0';
+      const data = `client_id=${client_id}&client_secret=${client_secret}&refresh_token=${refresh_token}&grant_type=refresh_token`;
+
+    fetch('https://www.googleapis.com/oauth2/v4/token',{
+      method: 'POST',
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: data
+    })
+    .then(response => response.json())
+    .then(jsonResponse => {
+     console.log(jsonResponse);
+    })
+    .catch(function(error) {
+      console.error(error);
+    });
+  }
+
   componentDidMount() {
     this.props.getFilesGoogle(this.state.token);
   }
@@ -84,6 +105,14 @@ class Google extends Component {
             <input type="file" id="file-upload" />
             <button type="submit">Submit</button>
           </form>
+        </div>
+        <div>
+        <button
+                className="btn btn-danger"
+                onClick={this.handleGetNew.bind(this)}
+              >
+               Eliminar
+        </button>
         </div>
       </div>
     );
