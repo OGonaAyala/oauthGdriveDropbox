@@ -6,18 +6,14 @@ import {
   deleteFilesGoogle,
   uploadFilesGoogle,
   downloadFilesGoogle,
+  saveToken,
 } from '../actions/actions';
+import store from '../redux/store';
 import { connect } from 'react-redux';
 
 class Google extends Component {
-  constructor() {
-    super();
-    this.state = {
-      token: '',
-    };
-  }
 
-  getTokenFromURL(str) {
+   getTokenFromURL(str) {
     var ret = Object.create(null);
     if (typeof str !== 'string') {
       return ret;
@@ -44,48 +40,55 @@ class Google extends Component {
   }
 
   uploadFile() {
+    const general = store.getState();
     const fileInput = document.getElementById('file-upload');
     const file = fileInput.files[0];
-    const token = this.state.token;
+    const token = general.tokenReducer.token.access_token;
     const data = { file, token };
     this.props.uploadFilesGoogle(data);
   }
 
-  componentWillMount() {
-    var query = this.getTokenFromURL(window.location.hash).token;
-    this.setState({
-      token: query,
-    });
+  handleGetNew() {
+    const client_id =
+      '1011461723910-5l7nmlhno2me1ahd5jksfc4ti96n35ua.apps.googleusercontent.com';
+    const client_secret = 'B88yPjs8m-sQeiapqnK-fWDz';
+    const refresh_token = this.state.token;
+    const data = `client_id=${client_id}&client_secret=${client_secret}&refresh_token=${refresh_token}&grant_type=refresh_token`;
+
+    fetch('https://www.googleapis.com/oauth2/v4/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: data,
+    })
+      .then(response => response.json())
+      .then(jsonResponse => {
+        return jsonResponse.access_token;
+      })
+      .then(files => {
+        this.setState({
+          token: files,
+        });
+      })
+      .catch(function(error) {
+        console.error(error);
+      });
   }
 
-  handleGetNew(){
-    
-      const client_id = "1011461723910-5l7nmlhno2me1ahd5jksfc4ti96n35ua.apps.googleusercontent.com";
-      const client_secret = "B88yPjs8m-sQeiapqnK-fWDz";
-      const refresh_token =  '1/Q_9Uq5ola04IBBYVRxDKZzPI2MYriMbpIXKZ2bQLvH0';
-      const data = `client_id=${client_id}&client_secret=${client_secret}&refresh_token=${refresh_token}&grant_type=refresh_token`;
-
-    fetch('https://www.googleapis.com/oauth2/v4/token',{
-      method: 'POST',
-      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-      body: data
-    })
-    .then(response => response.json())
-    .then(jsonResponse => {
-     console.log(jsonResponse);
-    })
-    .catch(function(error) {
-      console.error(error);
-    });
+  componentWillMount(){
+    const access_token = this.getTokenFromURL(window.location.hash).token;
+    const refresh_token = this.getTokenFromURL(window.location.hash).refreshToken;
+    const token = {access_token, refresh_token};
+    this.props.saveToken(token);
   }
 
   componentDidMount() {
-    this.props.getFilesGoogle(this.state.token);
+    const general = store.getState();
+    this.props.getFilesGoogle(general.tokenReducer.token.access_token);
   }
 
   render() {
+    console.log(this.props)
     const files = this.props.files;
-
     return (
       <div>
         <div>
@@ -93,7 +96,7 @@ class Google extends Component {
             <ListFiles
               key={file.id}
               {...file}
-              token={this.state.token}
+              token={this.props.tokens.access_token}
               delete={this.props.deleteFilesGoogle}
               download={this.props.downloadFilesGoogle}
             />
@@ -107,12 +110,12 @@ class Google extends Component {
           </form>
         </div>
         <div>
-        <button
-                className="btn btn-danger"
-                onClick={this.handleGetNew.bind(this)}
-              >
-               Eliminar
-        </button>
+          <button
+            className="btn btn-danger"
+            onClick={this.handleGetNew.bind(this)}
+          >
+            Nuevo access_token
+          </button>
         </div>
       </div>
     );
@@ -122,11 +125,13 @@ class Google extends Component {
 export default connect(
   state => ({
     files: state.filesReducer.files,
+    tokens: state.tokenReducer.token,
   }),
   {
     getFilesGoogle,
     deleteFilesGoogle,
     uploadFilesGoogle,
     downloadFilesGoogle,
+    saveToken,
   },
 )(Google);

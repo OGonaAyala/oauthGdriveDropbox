@@ -1,4 +1,4 @@
-import { GET_FILES } from '../constants/constants';
+import { GET_FILES, SAVE_TOKEN } from '../constants/constants';
 import {
   googleGet,
   googleDelete,
@@ -10,6 +10,19 @@ import {
 
 const Dropbox = require('dropbox').Dropbox;
 const getFiles = files => ({ type: GET_FILES, payload: files });
+const save = token => ({
+  type: SAVE_TOKEN, 
+  payload:{
+    access_token:token.access_token,
+    refresh_token:token.refresh_token
+  }});
+
+
+export const saveToken = token => {
+  return dispatch => {
+    dispatch(save(token));
+  };
+};
 
 export const getFilesGoogle = token => {
   return dispatch => {
@@ -121,3 +134,5 @@ export const uploadFileDropbox = data => {
       });
   };
 };
+
+
