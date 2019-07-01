@@ -49,10 +49,11 @@ class Google extends Component {
   }
 
   handleGetNew() {
+    const general = store.getState();
+    const refresh_token = general.tokenReducer.token.refresh_token;
     const client_id =
       '1011461723910-5l7nmlhno2me1ahd5jksfc4ti96n35ua.apps.googleusercontent.com';
     const client_secret = 'B88yPjs8m-sQeiapqnK-fWDz';
-    const refresh_token = this.state.token;
     const data = `client_id=${client_id}&client_secret=${client_secret}&refresh_token=${refresh_token}&grant_type=refresh_token`;
 
     fetch('https://www.googleapis.com/oauth2/v4/token', {
@@ -65,9 +66,9 @@ class Google extends Component {
         return jsonResponse.access_token;
       })
       .then(files => {
-        this.setState({
-          token: files,
-        });
+        const access_token = files;
+        const token = {access_token, refresh_token};
+        this.props.saveToken(token);
       })
       .catch(function(error) {
         console.error(error);
@@ -87,7 +88,7 @@ class Google extends Component {
   }
 
   render() {
-    console.log(this.props)
+    console.log(this.props.tokens.access_token)
     const files = this.props.files;
     return (
       <div>
