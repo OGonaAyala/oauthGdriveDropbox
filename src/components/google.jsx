@@ -12,8 +12,7 @@ import store from '../redux/store';
 import { connect } from 'react-redux';
 
 class Google extends Component {
-
-   getTokenFromURL(str) {
+  getTokenFromURL(str) {
     var ret = Object.create(null);
     if (typeof str !== 'string') {
       return ret;
@@ -67,7 +66,7 @@ class Google extends Component {
       })
       .then(files => {
         const access_token = files;
-        const token = {access_token, refresh_token};
+        const token = { access_token, refresh_token };
         this.props.saveToken(token);
       })
       .catch(function(error) {
@@ -75,10 +74,11 @@ class Google extends Component {
       });
   }
 
-  componentWillMount(){
+  componentWillMount() {
     const access_token = this.getTokenFromURL(window.location.hash).token;
-    const refresh_token = this.getTokenFromURL(window.location.hash).refreshToken;
-    const token = {access_token, refresh_token};
+    const refresh_token = this.getTokenFromURL(window.location.hash)
+      .refreshToken;
+    const token = { access_token, refresh_token };
     this.props.saveToken(token);
   }
 
@@ -88,10 +88,11 @@ class Google extends Component {
   }
 
   render() {
-    console.log(this.props.tokens.access_token)
+    console.log(this.props.tokens.access_token);
     const files = this.props.files;
     return (
-      <div>
+      <div className="App">
+        <h2>Files</h2>
         <div>
           {files.map(file => (
             <ListFiles

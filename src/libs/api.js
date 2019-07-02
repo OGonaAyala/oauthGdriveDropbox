@@ -33,7 +33,7 @@ export const googleUpload = data => {
     },
     body: data.file,
   };
-  return fetch(url, request);
+  return fetch(url, request).then(response => response.json());
 };
 
 export const googleDownload = id => {

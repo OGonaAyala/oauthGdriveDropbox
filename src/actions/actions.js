@@ -1,4 +1,9 @@
-import { GET_FILES, SAVE_TOKEN } from '../constants/constants';
+import {
+  GET_FILES,
+  SAVE_TOKEN,
+  UPLOAD_FILE,
+  DELETE_FILES,
+} from '../constants/constants';
 import {
   googleGet,
   googleDelete,
@@ -10,13 +15,20 @@ import {
 
 const Dropbox = require('dropbox').Dropbox;
 const getFiles = files => ({ type: GET_FILES, payload: files });
+const uploadFiles = files => ({ type: UPLOAD_FILE, payload: files });
+const deleteFiles = file => ({
+  type: DELETE_FILES,
+  payload: {
+    id: file.id,
+  },
+});
 const save = token => ({
-  type: SAVE_TOKEN, 
-  payload:{
-    access_token:token.access_token,
-    refresh_token:token.refresh_token
-  }});
-
+  type: SAVE_TOKEN,
+  payload: {
+    access_token: token.access_token,
+    refresh_token: token.refresh_token,
+  },
+});
 
 export const saveToken = token => {
   return dispatch => {
@@ -40,6 +52,10 @@ export const deleteFilesGoogle = id => {
       .then(function(response) {
         console.log(response);
       })
+      .then(res => {
+        dispatch(deleteFiles(id));
+      })
+
       .catch(res => {
         console.log(res);
       });
@@ -51,6 +67,10 @@ export const uploadFilesGoogle = content => {
     googleUpload(content)
       .then(function(response) {
         console.log(response);
+        return response;
+      })
+      .then(res => {
+        dispatch(uploadFiles(res));
       })
       .catch(res => {
         console.log(res);
@@ -95,9 +115,16 @@ export const getFilesDropbox = token => {
 export const deleteFilesDropbox = id => {
   return dispatch => {
     dropboxDelete(id)
-      .then(res => res.json())
-      .catch(error => console.error('Error:', error))
-      .then(response => console.log('Success:', response));
+      .then(function(response) {
+        console.log(response);
+      })
+      .then(res => {
+        dispatch(deleteFiles(id));
+      })
+
+      .catch(res => {
+        console.log(res);
+      });
   };
 };
 
@@ -127,12 +154,13 @@ export const uploadFileDropbox = data => {
     dbx
       .filesUpload({ path: '/Imagenes/' + data.file.name, contents: data.file })
       .then(function(response) {
-        console.log(response);
+        return response;
+      })
+      .then(res => {
+        dispatch(uploadFiles(res));
       })
       .catch(res => {
         console.log(res);
       });
   };
 };
-
-
