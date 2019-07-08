@@ -1,3 +1,20 @@
+export const googleSaveToken = token => {
+  const url = 'https://api.mlab.com/api/1/databases/tokens_omar/collections/tokensUser?apiKey=7N0hJ19t7vyboGPojW8evejTxlwizS-i';
+  const request = {
+    method: 'POST',
+    body: JSON.stringify(token),
+    headers: {
+            "Content-type": "application/json; charset=UTF-8"
+        }
+  };
+  return fetch(url, request).then(response => response.json());
+};
+
+export const googleGetToken = (id) => {
+  const url = `https://api.mlab.com/api/1/databases/tokens_omar/collections/tokensUser/${id}?apiKey=7N0hJ19t7vyboGPojW8evejTxlwizS-i`;
+  return fetch(url).then(response => response.json());
+};
+
 export const googleGet = token => {
   const url = 'https://www.googleapis.com/drive/v3/files';
   const request = {
@@ -22,6 +39,9 @@ export const googleDelete = id => {
 
 export const googleUpload = data => {
   console.log(data);
+   const formData = new FormData();
+    formData.append("Name", data.file.name);
+    formData.append("Type", data.file.type);
   const url =
     'https://www.googleapis.com/upload/drive/v3/files?uploadType=media';
   const request = {
@@ -29,7 +49,7 @@ export const googleUpload = data => {
     headers: {
       'Content-Type': data.file.type,
       'Content-Lenght': data.file.size,
-      Authorization: `Bearer ${data.token}`,
+      Authorization: `Bearer ${data.token}`
     },
     body: data.file,
   };
@@ -46,6 +66,20 @@ export const googleDownload = id => {
     },
   };
   return fetch(url, request);
+};
+
+export const googleNewToken = refreshToken => {
+   const client_id =
+      '1011461723910-5l7nmlhno2me1ahd5jksfc4ti96n35ua.apps.googleusercontent.com';
+    const client_secret = 'B88yPjs8m-sQeiapqnK-fWDz';
+    const data = `client_id=${client_id}&client_secret=${client_secret}&refresh_token=${refreshToken}&grant_type=refresh_token`;
+    const url = 'https://www.googleapis.com/oauth2/v4/token';
+    const request = {
+        method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: data
+    };
+    return fetch(url, request);
 };
 
 export const dropboxDelete = id => {

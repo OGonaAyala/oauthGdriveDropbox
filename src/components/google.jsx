@@ -7,11 +7,13 @@ import {
   uploadFilesGoogle,
   downloadFilesGoogle,
   saveToken,
+  getNewToken
 } from '../actions/actions';
 import store from '../redux/store';
 import { connect } from 'react-redux';
 
 class Google extends Component {
+  
   getTokenFromURL(str) {
     var ret = Object.create(null);
     if (typeof str !== 'string') {
@@ -47,31 +49,10 @@ class Google extends Component {
     this.props.uploadFilesGoogle(data);
   }
 
-  handleGetNew() {
-    const general = store.getState();
-    const refresh_token = general.tokenReducer.token.refresh_token;
-    const client_id =
-      '1011461723910-5l7nmlhno2me1ahd5jksfc4ti96n35ua.apps.googleusercontent.com';
-    const client_secret = 'B88yPjs8m-sQeiapqnK-fWDz';
-    const data = `client_id=${client_id}&client_secret=${client_secret}&refresh_token=${refresh_token}&grant_type=refresh_token`;
-
-    fetch('https://www.googleapis.com/oauth2/v4/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: data,
-    })
-      .then(response => response.json())
-      .then(jsonResponse => {
-        return jsonResponse.access_token;
-      })
-      .then(files => {
-        const access_token = files;
-        const token = { access_token, refresh_token };
-        this.props.saveToken(token);
-      })
-      .catch(function(error) {
-        console.error(error);
-      });
+  newAccessToken() {
+      const general = store.getState();
+      const refresh_token = general.tokenReducer.token.refresh_token;
+      this.props.getNewToken(refresh_token);
   }
 
   componentWillMount() {
@@ -114,7 +95,7 @@ class Google extends Component {
         <div>
           <button
             className="btn btn-danger"
-            onClick={this.handleGetNew.bind(this)}
+            onClick={this.newAccessToken.bind(this)}
           >
             Nuevo access_token
           </button>
@@ -135,5 +116,6 @@ export default connect(
     uploadFilesGoogle,
     downloadFilesGoogle,
     saveToken,
+    getNewToken
   },
 )(Google);

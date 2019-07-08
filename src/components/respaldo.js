@@ -1,3 +1,129 @@
+import React, { Component } from 'react';
+import '../App.css';
+import ListFiles from '../components/listFiles.jsx';
+import {
+  getFilesGoogle,
+  deleteFilesGoogle,
+  uploadFilesGoogle,
+  downloadFilesGoogle,
+  saveToken,
+  getNewToken,
+  getAccessToken
+} from '../actions/actions';
+import store from '../redux/store';
+import { connect } from 'react-redux';
+
+class Google extends Component {
+
+  getTokenFromURL(str) {
+    var ret = Object.create(null);
+    if (typeof str !== 'string') {
+      return ret;
+    }
+    str = str.trim().replace(/^(\?|#|&)/, '');
+    if (!str) {
+      return ret;
+    }
+    str.split('&').forEach(function(param) {
+      var parts = param.replace(/\+/g, ' ').split('=');
+      var key = parts.shift();
+      var val = parts.length > 0 ? parts.join('=') : undefined;
+      key = decodeURIComponent(key);
+      val = val === undefined ? null : decodeURIComponent(val);
+      if (ret[key] === undefined) {
+        ret[key] = val;
+      } else if (Array.isArray(ret[key])) {
+        ret[key].push(val);
+      } else {
+        ret[key] = [ret[key], val];
+      }
+    });
+    return ret;
+  }
+
+  uploadFile() {
+    const general = store.getState();
+    const fileInput = document.getElementById('file-upload');
+    const file = fileInput.files[0];
+    const token = general.tokenReducer.token.access_token;
+    const data = { file, token };
+    this.props.uploadFilesGoogle(data);
+  }
+
+  newAccessToken() {
+      const general = store.getState();
+      const refresh_token = general.tokenReducer.token.refresh_token;
+      this.props.getNewToken(refresh_token);
+  }
+
+  componentWillMount(){
+    const id = this.getTokenFromURL(window.location.hash).id_cliente;
+    console.log(id);
+    this.props.getAccessToken(id);
+    
+  }
+
+  componentDidMount() {
+    const general = store.getState();
+    //this.props.getFilesGoogle(general.tokenReducer.token.access_token);
+  }
+
+  render() {
+    console.log(this.props.tokens.access_token);
+    const files = this.props.files;
+    return (
+      <div className="App">
+        <h2>Files</h2>
+        <div>
+         
+        </div>
+        <div>
+          <h2>Subir archivo</h2>
+          <form onSubmit={this.uploadFile.bind(this)}>
+            <input type="file" id="file-upload" />
+            <button type="submit">Submit</button>
+          </form>
+        </div>
+        <div>
+          <button
+            className="btn btn-danger"
+            onClick={this.newAccessToken.bind(this)}
+          >
+            Nuevo access_token
+          </button>
+        </div>
+      </div>
+    );
+  }
+}
+
+export default connect(
+  state => ({
+    files: state.filesReducer.files,
+    tokens: state.tokenReducer.token,
+  }),
+  {
+    getFilesGoogle,
+    deleteFilesGoogle,
+    uploadFilesGoogle,
+    downloadFilesGoogle,
+    saveToken,
+    getNewToken,
+    getAccessToken
+  },
+)(Google);
+
+
+
+
+
+
+
+
+
+
+_----------------------------------------------------
+
 import {
   GET_FILES,
   SAVE_TOKEN,
@@ -5,6 +131,8 @@ import {
   DELETE_FILES,
 } from '../constants/constants';
 import {
+  googleSaveToken,
+  googleGetToken,
   googleGet,
   googleDelete,
   googleUpload,
@@ -33,7 +161,30 @@ const save = token => ({
 
 export const saveToken = token => {
   return dispatch => {
-    dispatch(save(token));
+    googleSaveToken(token)
+     .then(response => response.json())
+      .then(jsonResponse => {
+        console.log(jsonResponse);
+      })
+      .catch(function(error) {
+        console.error(error);
+      });
+  };
+};
+
+export const getAccessToken = (id) => {
+  return dispatch => {
+    googleGetToken(id)
+       .then(function(response) {
+        return response;
+      })
+       .then(res => {
+        console.log(res);
+        //dispatch(save(token));
+      })
+      .catch(function(error) {
+        console.error(error);
+      });
   };
 };
 
@@ -74,7 +225,6 @@ export const deleteFilesGoogle = id => {
       .then(res => {
         dispatch(deleteFiles(id));
       })
-
       .catch(res => {
         console.log(res);
       });
