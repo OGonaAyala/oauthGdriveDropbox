@@ -2,10 +2,12 @@ import {
   GET_FILES,
   UPLOAD_FILE,
   DELETE_FILES,
+  SHARE_LINK
 } from '../../constants/constants';
 
 const initialState = {
   files: [],
+  link:[]
 };
 
 export default (state = initialState, action) => {
@@ -24,6 +26,12 @@ export default (state = initialState, action) => {
       return {
         ...state,
         files: [...state.files.filter(file => file.id !== action.payload.id)],
+      };
+
+      case SHARE_LINK:
+      return {
+     ...state, 
+     link: [action.payload, ...state.link]
       };
 
     default:

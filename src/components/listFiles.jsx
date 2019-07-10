@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { Table } from 'reactstrap';
+import { connect } from 'react-redux';
+import ListLinks from './listLinks.jsx';
 
 class ListFiles extends Component {
   handleDelete() {
@@ -19,7 +21,17 @@ class ListFiles extends Component {
     this.props.download(param);
   }
 
+  handleShare() {
+    const name = this.props.name;
+    const token = this.props.token;
+    const id = this.props.id;
+    const param = { name, token, id };
+    this.props.share(param);
+  }
+
   render() {
+    console.log(this.props.links);
+    const links = this.props.links;
     return (
       <Table align="center">
         <tbody>
@@ -41,6 +53,24 @@ class ListFiles extends Component {
                 Eliminar
               </button>
             </td>
+            <td>
+              <button
+                className="btn btn-success"
+                onClick={this.handleShare.bind(this)}
+              >
+                Enlace para compartir
+              </button>
+            </td>
+            <td>
+              {links.map(link => (
+                <ListLinks
+                  key={link.id}
+                  idFile={this.props.id}
+                  idLink={link.id}
+                  link={link.link}
+                />
+              ))}
+            </td>
           </tr>
         </tbody>
       </Table>
@@ -48,4 +78,6 @@ class ListFiles extends Component {
   }
 }
 
-export default ListFiles;
+export default connect(state => ({
+  links: state.filesReducer.link,
+}))(ListFiles);

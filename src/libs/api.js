@@ -108,3 +108,17 @@ export const dropboxDownload = id => {
   };
   return fetch(url, request);
 };
+
+export const shareDropbox = params => {
+  const data = { path: `/Imagenes/${params.name}`};
+  const url = 'https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings';
+  const request = {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${params.token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  };
+  return fetch(url, request).then(response => response.json());
+};

@@ -7,6 +7,7 @@ import {
   deleteFilesDropbox,
   downloadFilesDropbox,
   uploadFileDropbox,
+  shareLinkDropbox,
 } from '../actions/actions';
 
 class Dropbox extends Component {
@@ -75,6 +76,7 @@ class Dropbox extends Component {
               {...file}
               delete={this.props.deleteFilesDropbox}
               download={this.props.downloadFilesDropbox}
+              share={this.props.shareLinkDropbox}
             />
           ))}
         </div>
@@ -99,5 +101,6 @@ export default connect(
     deleteFilesDropbox,
     downloadFilesDropbox,
     uploadFileDropbox,
+    shareLinkDropbox,
   },
 )(Dropbox);
