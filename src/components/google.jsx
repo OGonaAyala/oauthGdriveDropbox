@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import '../App.css';
-import ListFiles from '../components/listFiles.jsx';
+import ListFiles from '../components/listFilesGoogle.jsx';
 import {
   getFilesGoogle,
   deleteFilesGoogle,

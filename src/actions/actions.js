@@ -3,7 +3,7 @@ import {
   SAVE_TOKEN,
   UPLOAD_FILE,
   DELETE_FILES,
-  SHARE_LINK
+  SHARE_LINK,
 } from '../constants/constants';
 import {
   googleGet,
@@ -14,6 +14,7 @@ import {
   dropboxDelete,
   dropboxDownload,
   shareDropbox,
+  shareGoogle,
 } from '../libs/api';
 
 const Dropbox = require('dropbox').Dropbox;
@@ -33,12 +34,12 @@ const save = token => ({
   },
 });
 const shareLink = link => ({
-  type: SHARE_LINK, 
+  type: SHARE_LINK,
   payload: {
     id: link.id,
-    link: link.link
+    link: link.link,
   },
-  });
+});
 
 export const saveToken = token => {
   return dispatch => {
@@ -199,17 +200,29 @@ export const shareLinkDropbox = params => {
       .then(function(response) {
         if (response.error === undefined) {
           console.log(response.url);
-          return (response.url);
+          return response.url;
         } else {
           console.log(response.error.shared_link_already_exists.metadata.url);
-          return (response.error.shared_link_already_exists.metadata.url)
+          return response.error.shared_link_already_exists.metadata.url;
         }
       })
       .then(res => {
         const id = params.id;
         const link = res;
-        const data = {id, link};
+        const data = { id, link };
         dispatch(shareLink(data));
+      })
+      .catch(res => {
+        console.log(res);
+      });
+  };
+};
+
+export const shareFileGoogle = params => {
+  return dispatch => {
+    shareGoogle(params)
+      .then(function(response) {
+        return alert('Se compartio correctamente');
       })
       .catch(res => {
         console.log(res);
