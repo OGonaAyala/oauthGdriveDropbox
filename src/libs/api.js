@@ -11,9 +11,27 @@ export const googleSaveToken = token => {
   return fetch(url, request).then(response => response.json());
 };
 
+export const googleUpdateToken = token => {
+  console.log(token._id);
+  const url = `https://api.mlab.com/api/1/databases/tokens_omar/collections/tokensUser/${
+    token._id
+  }?apiKey=7N0hJ19t7vyboGPojW8evejTxlwizS-i`;
+  const request = {
+    method: 'PUT',
+    body: JSON.stringify({
+      access_token: token.access_token,
+      refresh_token: token.refresh_token,
+    }),
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+  };
+  return fetch(url, request);
+};
+
 export const googleGetToken = id => {
   const url = `https://api.mlab.com/api/1/databases/tokens_omar/collections/tokensUser/${id}?apiKey=7N0hJ19t7vyboGPojW8evejTxlwizS-i`;
-  return fetch(url).then(response => response.json());
+  return fetch(url);
 };
 
 export const googleGet = token => {
@@ -24,7 +42,7 @@ export const googleGet = token => {
       Authorization: `Bearer ${token}`,
     },
   };
-  return fetch(url, request).then(response => response.json());
+  return fetch(url, request);
 };
 
 export const googleDelete = id => {
@@ -40,9 +58,6 @@ export const googleDelete = id => {
 
 export const googleUpload = data => {
   console.log(data);
-  const formData = new FormData();
-  formData.append('Name', data.file.name);
-  formData.append('Type', data.file.type);
   const url =
     'https://www.googleapis.com/upload/drive/v3/files?uploadType=media';
   const request = {
@@ -54,7 +69,7 @@ export const googleUpload = data => {
     },
     body: data.file,
   };
-  return fetch(url, request).then(response => response.json());
+  return fetch(url, request);
 };
 
 export const googleDownload = id => {
@@ -80,7 +95,7 @@ export const googleNewToken = refreshToken => {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: data,
   };
-  return fetch(url, request);
+  return fetch(url, request).then(response => response.json());
 };
 
 export const dropboxDelete = id => {
@@ -99,7 +114,7 @@ export const dropboxDelete = id => {
 
 export const dropboxDownload = id => {
   const data = { path: `/Imagenes/${id.name}` };
-  const url = 'https://www.googleapis.com/drive/v3/files/fileId/permissions';
+  const url = 'https://content.dropboxapi.com/2/files/download';
   const request = {
     method: 'POST',
     headers: {
@@ -141,5 +156,5 @@ export const shareGoogle = params => {
     },
     body: JSON.stringify(data),
   };
-  return fetch(url, request).then(response => response.json());
+  return fetch(url, request);
 };

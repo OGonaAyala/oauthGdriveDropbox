@@ -42,15 +42,20 @@ class ListFiles extends Component {
     const email = this.state.email;
     const id = this.props.id;
     const token = this.props.token;
-    const param = { email, id, token };
+    const idclient = this.props.idclient;
+    const refresh_token = this.props.refresh_token;
+    const param = { email, id, token, refresh_token, idclient };
     this.props.shareFileGoogle(param);
   }
 
   handleDelete() {
     const id = this.props.id;
+    const idclient = this.props.idclient;
+    const refresh_token = this.props.refresh_token;
     const name = this.props.name;
+    const idname = this.props.name;
     const token = this.props.token;
-    const param = { id, name, token };
+    const param = { id, name, token, refresh_token, idclient };
     this.props.delete(param);
   }
 
@@ -59,7 +64,9 @@ class ListFiles extends Component {
     const name = this.props.name;
     const type = this.props.mimeType;
     const token = this.props.token;
-    const param = { id, name, type, token };
+    const idclient = this.props.idclient;
+    const refresh_token = this.props.refresh_token;
+    const param = { id, name, type, token, idclient, refresh_token };
     this.props.download(param);
   }
 

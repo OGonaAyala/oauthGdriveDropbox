@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Google from './components/google.jsx';
+import Google from './components/pruebas.jsx';
 import Dropbox from './components/dropbox.jsx';
+import Success from './components/oauthSuccess';
 import App from './App.js';
 import { Route, Switch, BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -14,8 +15,10 @@ ReactDOM.render(
     <BrowserRouter>
       <Switch>
         <Route path="/" component={App} exact />
-        <Route path="/googleSucces" component={Google} />
-        <Route path="/dropboxSucces" component={Dropbox} />
+        <Route path="/googleSucces" component={Success} />
+        <Route path="/dropboxSucces" component={Success} />
+        <Route path="/pruebas" component={Google} />
+        <Route path="/dropbox" component={Dropbox} />
       </Switch>
     </BrowserRouter>
   </Provider>,

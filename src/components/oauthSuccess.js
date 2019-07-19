@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Google from './google.jsx';
 import { saveToken } from '../actions/actions';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router';
@@ -40,28 +39,49 @@ class Success extends Component {
   }
 
   componentWillMount() {
-    const access_token = this.getTokenFromURL(window.location.hash).token;
-    const refresh_token = this.getTokenFromURL(window.location.hash).refreshToken;
     const _id = Math.floor(Math.random() * 10000);
-    const token = { _id, access_token, refresh_token };
-    this.props.saveToken(token);
-    this.setState({
-      readyToRedirect: true,
-      key: _id,
-    });
+
+    if (window.location.pathname === '/dropboxSucces') {
+      const access_token = this.getTokenFromURL(window.location.hash)
+        .access_token;
+      const tokenDropbox = { _id, access_token };
+      this.props.saveToken(tokenDropbox);
+      this.setState({
+        key: _id,
+        readyToRedirect: true,
+        pathName: window.location.pathname,
+      });
+    } else {
+      const access_token = this.getTokenFromURL(window.location.hash).token;
+      const refresh_token = this.getTokenFromURL(window.location.hash)
+        .refreshToken;
+      const token = { _id, access_token, refresh_token };
+      this.props.saveToken(token);
+      this.setState({
+        key: _id,
+        readyToRedirect: true,
+        pathName: window.location.pathname,
+      });
+    }
+    this.props.history.push('/oauthSucces');
   }
 
   render() {
-    console.log(this.state.readyToRedirect);
-    const url = `/google#id_cliente=${this.state.key}`;
-    if (this.state.readyToRedirect) return <Redirect to={url} />;
+    if (
+      this.state.readyToRedirect === true &&
+      this.state.pathName === '/dropboxSucces'
+    ) {
+      const url = `/dropbox#id_cliente=${this.state.key}`;
+      return <Redirect to={url} />;
+    } else {
+      const url = `/pruebas#id_cliente=${this.state.key}`;
+      return <Redirect to={url} />;
+    }
   }
 }
 
 export default connect(
-  state => ({
-    tokens: state.tokenReducer.token,
-  }),
+  null,
   {
     saveToken,
   },

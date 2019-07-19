@@ -7,7 +7,7 @@ import {
   uploadFilesGoogle,
   downloadFilesGoogle,
   saveToken,
-  getNewToken
+  getAccessToken
 } from '../actions/actions';
 import store from '../redux/store';
 import { connect } from 'react-redux';
@@ -49,27 +49,22 @@ class Google extends Component {
     this.props.uploadFilesGoogle(data);
   }
 
-  newAccessToken() {
-      const general = store.getState();
-      const refresh_token = general.tokenReducer.token.refresh_token;
-      this.props.getNewToken(refresh_token);
-  }
-
-  componentWillMount() {
+   componentWillMount() {
     const access_token = this.getTokenFromURL(window.location.hash).token;
-    const refresh_token = this.getTokenFromURL(window.location.hash)
-      .refreshToken;
+    const refresh_token = this.getTokenFromURL(window.location.hash).refreshToken;
     const token = { access_token, refresh_token };
+    console.log(token)
     this.props.saveToken(token);
   }
 
   componentDidMount() {
     const general = store.getState();
+    console.log(general.tokenReducer.token.access_token)
     this.props.getFilesGoogle(general.tokenReducer.token.access_token);
   }
 
   render() {
-    console.log(this.props.tokens.access_token);
+    //console.log(this.props.tokens);
     const files = this.props.files;
     return (
       <div className="App">
@@ -92,14 +87,6 @@ class Google extends Component {
             <button type="submit">Submit</button>
           </form>
         </div>
-        <div>
-          <button
-            className="btn btn-danger"
-            onClick={this.newAccessToken.bind(this)}
-          >
-            Nuevo access_token
-          </button>
-        </div>
       </div>
     );
   }
@@ -108,7 +95,7 @@ class Google extends Component {
 export default connect(
   state => ({
     files: state.filesReducer.files,
-    tokens: state.tokenReducer.token,
+    tokens: state.tokenReducer.token
   }),
   {
     getFilesGoogle,
@@ -116,6 +103,6 @@ export default connect(
     uploadFilesGoogle,
     downloadFilesGoogle,
     saveToken,
-    getNewToken
+    getAccessToken
   },
 )(Google);

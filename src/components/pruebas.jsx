@@ -1,23 +1,27 @@
 import React, { Component } from 'react';
 import '../App.css';
-import ListFiles from '../components/listFiles.jsx';
-import { connect } from 'react-redux';
+import ListFiles from '../components/listFilesGoogle.jsx';
 import {
-  getFilesDropbox,
-  deleteFilesDropbox,
-  downloadFilesDropbox,
-  uploadFileDropbox,
-  shareLinkDropbox,
-  getAccessTokenDropbox
+  getAccessToken,
+  deleteFilesGoogle,
+  uploadFilesGoogle,
+  downloadFilesGoogle,
+  getNewToken
 } from '../actions/actions';
 import store from '../redux/store';
+import { connect } from 'react-redux';
+import {
+  Button,
+} from 'reactstrap';
 
-class Dropbox extends Component {
-  constructor() {
-    super();
-    this.state = {
-      token: '',
+class Google extends Component {
+  
+   constructor(props) {
+    super(props);
+     this.state = {
+      id: ''
     };
+    //this.newToken = this.newToken.bind(this);
   }
 
   getTokenFromURL(str) {
@@ -46,18 +50,23 @@ class Dropbox extends Component {
     return ret;
   }
 
-  componentWillMount() {
-    const client_id = this.getTokenFromURL(window.location.hash).id_cliente;
-    this.props.getAccessTokenDropbox(client_id);
-  }
-
-  uploadFile() {
+   uploadFile() {
     const general = store.getState();
     const fileInput = document.getElementById('file-upload');
     const file = fileInput.files[0];
     const token = general.tokenReducer.token.access_token;
-    const data = { file, token };
-    this.props.uploadFileDropbox(data);
+    const refresh_token = general.tokenReducer.token.refresh_token;
+    const _id = this.state.id;
+    const data = { file, token, _id, refresh_token };
+    this.props.uploadFilesGoogle(data);
+  }
+
+  componentWillMount() {
+    const client_id = this.getTokenFromURL(window.location.hash).id_cliente;
+    this.props.getAccessToken(client_id);
+     this.setState(prevState => ({
+      id: client_id
+    }));
   }
 
   render() {
@@ -69,11 +78,12 @@ class Dropbox extends Component {
           {files.map(file => (
             <ListFiles
               key={file.id}
-              token={this.props.tokens.access_token}
               {...file}
-              delete={this.props.deleteFilesDropbox}
-              download={this.props.downloadFilesDropbox}
-              share={this.props.shareLinkDropbox}
+              token={this.props.tokens.access_token}
+              idclient={this.state.id}
+              refresh_token = {this.props.tokens.refresh_token}
+              delete={this.props.deleteFilesGoogle}
+              download={this.props.downloadFilesGoogle}
             />
           ))}
         </div>
@@ -92,14 +102,13 @@ class Dropbox extends Component {
 export default connect(
   state => ({
     files: state.filesReducer.files,
-    tokens: state.tokenReducer.token
+    tokens: state.tokenReducer.token,
   }),
   {
-    getFilesDropbox,
-    deleteFilesDropbox,
-    downloadFilesDropbox,
-    uploadFileDropbox,
-    shareLinkDropbox,
-    getAccessTokenDropbox
-  },
-)(Dropbox);
+    getAccessToken,
+    deleteFilesGoogle,
+    uploadFilesGoogle,
+    downloadFilesGoogle,
+    getNewToken
+  }
+)(Google);
