@@ -1,11 +1,53 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
 
-const ListLinks = function(props) {
-  if (props.idFile === props.idLink) {
-    return <p>{props.link}</p>;
-  } else {
-    return <p />;
+class ListLinks extends Component {
+  constructor() {
+    super();
+    this.state = {
+      modal: false,
+    };
+    this.toggle = this.toggle.bind(this);
   }
-};
+
+  toggle() {
+    this.setState(prevState => ({
+      modal: !prevState.modal,
+    }));
+  }
+
+  render() {
+    if (this.props.idFile === this.props.idLink) {
+      return (
+        <div>
+          <Button color="danger" onClick={this.toggle}>
+            Ver enlace
+          </Button>
+          <Modal
+            isOpen={this.state.modal}
+            toggle={this.toggle}
+            className={this.props.className}
+          >
+            <ModalHeader toggle={this.toggle}>Enlace de archivo</ModalHeader>
+            <ModalBody>
+              <label>
+                Copia este enlace y mandalo a quien quieras compartir este
+                archivo
+              </label>
+              <label>{this.props.link}</label>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="secondary" onClick={this.toggle}>
+                Cerrar
+              </Button>
+            </ModalFooter>
+          </Modal>
+        </div>
+      );
+    } else {
+      return <p />;
+    }
+  }
+}
 
 export default ListLinks;

@@ -1,37 +1,59 @@
 import React, { Component } from 'react';
-import { Table } from 'reactstrap';
+import {
+  Table,
+  Button,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from 'reactstrap';
+import { shareFileGoogle } from '../actions/actions';
 import { connect } from 'react-redux';
 import ListLinks from './listLinks.jsx';
 
 class ListFiles extends Component {
-  handleDelete() {
-    const id = this.props.id;
-    const name = this.props.name;
-    const token = this.props.token;
-    const param = { id, name, token };
-    this.props.delete(param);
+  constructor(props) {
+    super(props);
+    this.state = {
+      modal: false,
+      email: '',
+      url: '/google',
+    };
+
+    this.toggle = this.toggle.bind(this);
+    this.handleInput = this.handleInput.bind(this);
+    this.shareGoogle = this.shareGoogle.bind(this);
   }
 
-  handleDownload() {
-    const id = this.props.id;
-    const name = this.props.name;
-    const type = this.props.mimeType;
-    const token = this.props.token;
-    const param = { id, name, type, token };
-    this.props.download(param);
+  toggle() {
+    this.setState(prevState => ({
+      modal: !prevState.modal,
+    }));
   }
 
-  handleShare() {
-    const name = this.props.name;
-    const token = this.props.token;
-    const id = this.props.id;
-    const param = { name, token, id };
-    this.props.share(param);
+  handleInput(e) {
+    const { value } = e.target;
+    this.setState({
+      email: value,
+    });
+  }
+
+  shareGoogle(param) {
+    this.toggle();
+    this.props.shareFileGoogle(param);
   }
 
   render() {
-    console.log(this.props.links);
+    const type = this.props.mimeType;
+    const id = this.props.id;
+    const idclient = this.props.idclient;
+    const refresh_token = this.props.refresh_token;
+    const name = this.props.name;
+    const token = this.props.token;
+    const email = this.state.email;
+    const params = { email, id, name, token, refresh_token, idclient, type };
     const links = this.props.links;
+
     return (
       <Table align="center">
         <tbody>
@@ -40,7 +62,7 @@ class ListFiles extends Component {
             <td>
               <button
                 className="btn btn-success"
-                onClick={this.handleDownload.bind(this)}
+                onClick={() => this.props.download(params)}
               >
                 Descargar
               </button>
@@ -48,28 +70,70 @@ class ListFiles extends Component {
             <td>
               <button
                 className="btn btn-danger"
-                onClick={this.handleDelete.bind(this)}
+                onClick={() => this.props.delete(params)}
               >
                 Eliminar
               </button>
             </td>
+            {this.state.url === this.props.url ? (
+              <td>
+                <div>
+                  <Button color="danger" onClick={this.toggle}>
+                    Compartir archivo
+                  </Button>
+                  <Modal
+                    isOpen={this.state.modal}
+                    toggle={this.toggle}
+                    className={this.props.className}
+                  >
+                    <ModalHeader toggle={this.toggle}>
+                      Compartir Archivo
+                    </ModalHeader>
+                    <ModalBody>
+                      <label>Email de la persona para compartir archivo</label>
+                      <input
+                        type="text"
+                        name="email"
+                        onChange={this.handleInput}
+                      />
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button
+                        color="primary"
+                        onClick={() => this.shareGoogle(params)}
+                      >
+                        Compartir
+                      </Button>
+                      <Button color="secondary" onClick={this.toggle}>
+                        Cancelar
+                      </Button>
+                    </ModalFooter>
+                  </Modal>
+                </div>
+              </td>
+            ) : (
+              <td>
+                <div>
+                  <button
+                    className="btn btn-success"
+                    onClick={() => this.props.share(params)}
+                  >
+                    Enlace para compartir
+                  </button>
+                </div>
+              </td>
+            )}
             <td>
-              <button
-                className="btn btn-success"
-                onClick={this.handleShare.bind(this)}
-              >
-                Enlace para compartir
-              </button>
-            </td>
-            <td>
-              {links.map(link => (
-                <ListLinks
-                  key={link.id}
-                  idFile={this.props.id}
-                  idLink={link.id}
-                  link={link.link}
-                />
-              ))}
+              <div>
+                {links.map(link => (
+                  <ListLinks
+                    key={link.id}
+                    idFile={this.props.id}
+                    idLink={link.id}
+                    link={link.link}
+                  />
+                ))}
+              </div>
             </td>
           </tr>
         </tbody>
@@ -78,6 +142,9 @@ class ListFiles extends Component {
   }
 }
 
-export default connect(state => ({
-  links: state.filesReducer.link,
-}))(ListFiles);
+export default connect(
+  state => ({
+    links: state.filesReducer.link,
+  }),
+  { shareFileGoogle },
+)(ListFiles);

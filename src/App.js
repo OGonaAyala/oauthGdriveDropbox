@@ -22,7 +22,6 @@ class App extends Component {
   }
 
   render() {
-    console.log(this.state.url);
     return (
       <div className="App">
         <a href="http://localhost:4500/auth/google" className="button">

@@ -1,19 +1,24 @@
 import React, { Component } from 'react';
 import '../App.css';
-import ListFiles from '../components/listFilesGoogle.jsx';
+import ListFiles from '../components/listFiles.jsx';
 import {
-  getFilesGoogle,
+  getAccessToken,
   deleteFilesGoogle,
   uploadFilesGoogle,
   downloadFilesGoogle,
-  saveToken,
-  getAccessToken
+  getNewToken,
 } from '../actions/actions';
 import store from '../redux/store';
 import { connect } from 'react-redux';
 
 class Google extends Component {
-  
+  constructor(props) {
+    super(props);
+    this.state = {
+      id: '',
+    };
+  }
+
   getTokenFromURL(str) {
     var ret = Object.create(null);
     if (typeof str !== 'string') {
@@ -45,26 +50,21 @@ class Google extends Component {
     const fileInput = document.getElementById('file-upload');
     const file = fileInput.files[0];
     const token = general.tokenReducer.token.access_token;
-    const data = { file, token };
+    const refresh_token = general.tokenReducer.token.refresh_token;
+    const _id = this.state.id;
+    const data = { file, token, _id, refresh_token };
     this.props.uploadFilesGoogle(data);
   }
 
-   componentWillMount() {
-    const access_token = this.getTokenFromURL(window.location.hash).token;
-    const refresh_token = this.getTokenFromURL(window.location.hash).refreshToken;
-    const token = { access_token, refresh_token };
-    console.log(token)
-    this.props.saveToken(token);
-  }
-
-  componentDidMount() {
-    const general = store.getState();
-    console.log(general.tokenReducer.token.access_token)
-    this.props.getFilesGoogle(general.tokenReducer.token.access_token);
+  componentWillMount() {
+    const client_id = this.getTokenFromURL(window.location.hash).id_cliente;
+    this.props.getAccessToken(client_id);
+    this.setState(prevState => ({
+      id: client_id,
+    }));
   }
 
   render() {
-    //console.log(this.props.tokens);
     const files = this.props.files;
     return (
       <div className="App">
@@ -75,8 +75,11 @@ class Google extends Component {
               key={file.id}
               {...file}
               token={this.props.tokens.access_token}
+              idclient={this.state.id}
+              refresh_token={this.props.tokens.refresh_token}
               delete={this.props.deleteFilesGoogle}
               download={this.props.downloadFilesGoogle}
+              url={window.location.pathname}
             />
           ))}
         </div>
@@ -95,14 +98,13 @@ class Google extends Component {
 export default connect(
   state => ({
     files: state.filesReducer.files,
-    tokens: state.tokenReducer.token
+    tokens: state.tokenReducer.token,
   }),
   {
-    getFilesGoogle,
+    getAccessToken,
     deleteFilesGoogle,
     uploadFilesGoogle,
     downloadFilesGoogle,
-    saveToken,
-    getAccessToken
+    getNewToken,
   },
 )(Google);

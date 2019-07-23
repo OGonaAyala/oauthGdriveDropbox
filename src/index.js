@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Google from './components/pruebas.jsx';
+import Google from './components/google.jsx';
 import Dropbox from './components/dropbox.jsx';
 import Success from './components/oauthSuccess';
 import App from './App.js';
@@ -17,7 +17,7 @@ ReactDOM.render(
         <Route path="/" component={App} exact />
         <Route path="/googleSucces" component={Success} />
         <Route path="/dropboxSucces" component={Success} />
-        <Route path="/pruebas" component={Google} />
+        <Route path="/google" component={Google} />
         <Route path="/dropbox" component={Dropbox} />
       </Switch>
     </BrowserRouter>

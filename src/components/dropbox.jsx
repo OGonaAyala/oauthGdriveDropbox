@@ -8,18 +8,12 @@ import {
   downloadFilesDropbox,
   uploadFileDropbox,
   shareLinkDropbox,
-  getAccessTokenDropbox
+  getAccessTokenDropbox,
 } from '../actions/actions';
 import store from '../redux/store';
 
 class Dropbox extends Component {
-  constructor() {
-    super();
-    this.state = {
-      token: '',
-    };
-  }
-
+ 
   getTokenFromURL(str) {
     var ret = Object.create(null);
     if (typeof str !== 'string') {
@@ -74,6 +68,7 @@ class Dropbox extends Component {
               delete={this.props.deleteFilesDropbox}
               download={this.props.downloadFilesDropbox}
               share={this.props.shareLinkDropbox}
+              url={window.location.pathname}
             />
           ))}
         </div>
@@ -92,7 +87,7 @@ class Dropbox extends Component {
 export default connect(
   state => ({
     files: state.filesReducer.files,
-    tokens: state.tokenReducer.token
+    tokens: state.tokenReducer.token,
   }),
   {
     getFilesDropbox,
@@ -100,6 +95,6 @@ export default connect(
     downloadFilesDropbox,
     uploadFileDropbox,
     shareLinkDropbox,
-    getAccessTokenDropbox
+    getAccessTokenDropbox,
   },
 )(Dropbox);
