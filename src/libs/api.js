@@ -1,4 +1,4 @@
-export const googleSaveToken = token => {
+export const SaveAccessToken = token => {
   const url =
     'https://api.mlab.com/api/1/databases/tokens_omar/collections/tokensUser?apiKey=7N0hJ19t7vyboGPojW8evejTxlwizS-i';
   const request = {
@@ -29,7 +29,7 @@ export const googleUpdateToken = token => {
   return fetch(url, request);
 };
 
-export const googleGetToken = id => {
+export const GetToken = id => {
   const url = `https://api.mlab.com/api/1/databases/tokens_omar/collections/tokensUser/${id}?apiKey=7N0hJ19t7vyboGPojW8evejTxlwizS-i`;
   return fetch(url);
 };
@@ -57,7 +57,7 @@ export const googleDelete = id => {
 };
 
 export const googleUpload = data => {
-  console.log(data);
+  console.log(data.token);
   const url =
     'https://www.googleapis.com/upload/drive/v3/files?uploadType=media';
   const request = {

@@ -74,7 +74,7 @@ class Success extends Component {
       const url = `/dropbox#id_cliente=${this.state.key}`;
       return <Redirect to={url} />;
     } else {
-      const url = `/google#id_cliente=${this.state.key}`;
+      const url = `/google?#id_cliente=${this.state.key}`;
       return <Redirect to={url} />;
     }
   }

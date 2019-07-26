@@ -13,8 +13,7 @@ import {
 import store from '../redux/store';
 
 class Dropbox extends Component {
- 
-  getTokenFromURL(str) {
+   getTokenFromURL(str) {
     var ret = Object.create(null);
     if (typeof str !== 'string') {
       return ret;

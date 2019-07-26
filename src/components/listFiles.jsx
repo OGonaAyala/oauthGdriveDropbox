@@ -7,7 +7,7 @@ import {
   ModalBody,
   ModalFooter,
 } from 'reactstrap';
-import { shareFileGoogle } from '../actions/actions';
+import { shareFileGoogle } from '../actions/actionsGoogle';
 import { connect } from 'react-redux';
 import ListLinks from './listLinks.jsx';
 
@@ -19,7 +19,6 @@ class ListFiles extends Component {
       email: '',
       url: '/google',
     };
-
     this.toggle = this.toggle.bind(this);
     this.handleInput = this.handleInput.bind(this);
     this.shareGoogle = this.shareGoogle.bind(this);
