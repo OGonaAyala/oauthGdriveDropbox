@@ -30,11 +30,11 @@ class ListLinks extends Component {
           >
             <ModalHeader toggle={this.toggle}>Enlace de archivo</ModalHeader>
             <ModalBody>
-              <label>
+              <p>
                 Copia este enlace y mandalo a quien quieras compartir este
                 archivo
-              </label>
-              <label>{this.props.link}</label>
+              </p>
+              <p>{this.props.link}</p>
             </ModalBody>
             <ModalFooter>
               <Button color="secondary" onClick={this.toggle}>
@@ -44,9 +44,8 @@ class ListLinks extends Component {
           </Modal>
         </div>
       );
-    } else {
-      return <p />;
     }
+    return <p />;
   }
 }
 

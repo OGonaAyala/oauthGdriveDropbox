@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import './App.css';
+
 const Dropbox = require('dropbox').Dropbox;
 
 class App extends Component {

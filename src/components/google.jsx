@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import '../App.css';
-import ListFiles from '../components/listFiles.jsx';
+import ListFiles from '../components/listFiles';
 import {
   getAccessToken,
   deleteFilesGoogle,
@@ -8,40 +9,24 @@ import {
   downloadFilesGoogle,
 } from '../actions/actionsGoogle';
 import store from '../redux/store';
-import { connect } from 'react-redux';
+import { getTokenFromURL } from '../libs/api';
 
 class Google extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      modal: false,
       id: '',
     };
+    this.uploadFile = this.uploadFile.bind(this);
   }
 
-  getTokenFromURL(str) {
-    var ret = Object.create(null);
-    if (typeof str !== 'string') {
-      return ret;
-    }
-    str = str.trim().replace(/^(\?|#|&)/, '');
-    if (!str) {
-      return ret;
-    }
-    str.split('&').forEach(function(param) {
-      var parts = param.replace(/\+/g, ' ').split('=');
-      var key = parts.shift();
-      var val = parts.length > 0 ? parts.join('=') : undefined;
-      key = decodeURIComponent(key);
-      val = val === undefined ? null : decodeURIComponent(val);
-      if (ret[key] === undefined) {
-        ret[key] = val;
-      } else if (Array.isArray(ret[key])) {
-        ret[key].push(val);
-      } else {
-        ret[key] = [ret[key], val];
-      }
+  componentWillMount() {
+    const client_id = getTokenFromURL(window.location.hash).id_cliente;
+    this.props.getAccessToken(client_id);
+    this.setState({
+      id: client_id,
     });
-    return ret;
   }
 
   uploadFile() {
@@ -50,24 +35,19 @@ class Google extends Component {
     const file = fileInput.files[0];
     const token = general.tokenReducer.token.access_token;
     const refresh_token = general.tokenReducer.token.refresh_token;
-    const _id = this.state.id;
-    const data = { file, token, _id, refresh_token };
-    this.props.uploadFilesGoogle(data);
-  }
-
-  componentWillMount() {
-    const client_id = this.getTokenFromURL(window.location.hash).id_cliente;
-    this.props.getAccessToken(client_id);
-    this.setState(prevState => ({
-      id: client_id,
-    }));
+    const id = this.state.id;
+    const data = { file, token, id, refresh_token };
+    if (data.file) {
+      this.props.uploadFilesGoogle(data);
+    }
+    return false;
   }
 
   render() {
     const files = this.props.files;
     return (
       <div className="App">
-        <h2>Files</h2>
+        <h2>Archivos</h2>
         <div>
           {files.map(file => (
             <ListFiles
@@ -84,9 +64,9 @@ class Google extends Component {
         </div>
         <div>
           <h2>Subir archivo</h2>
-          <form onSubmit={this.uploadFile.bind(this)}>
+          <form onSubmit={this.uploadFile}>
             <input type="file" id="file-upload" />
-            <button type="submit">Submit</button>
+            <button type="submit">Subir</button>
           </form>
         </div>
       </div>

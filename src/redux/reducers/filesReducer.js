@@ -2,16 +2,15 @@ import {
   GET_FILES,
   UPLOAD_FILE,
   DELETE_FILES,
-  SHARE_LINK
+  SHARE_LINK,
 } from '../../constants/constants';
 
 const initialState = {
   files: [],
-  link:[]
+  link: [],
 };
 
 export default (state = initialState, action) => {
-  //console.log(action.payload);
   switch (action.type) {
     case GET_FILES:
       return {
@@ -28,10 +27,10 @@ export default (state = initialState, action) => {
         files: [...state.files.filter(file => file.id !== action.payload.id)],
       };
 
-      case SHARE_LINK:
+    case SHARE_LINK:
       return {
-     ...state, 
-     link: [action.payload, ...state.link]
+        ...state,
+        link: [action.payload, ...state.link],
       };
 
     default:

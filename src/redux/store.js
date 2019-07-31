@@ -4,8 +4,8 @@ import filesReducer from './reducers/filesReducer';
 import tokenReducer from './reducers/tokenReducer';
 
 const mainReducer = combineReducers({
-  filesReducer: filesReducer,
-  tokenReducer: tokenReducer
+  filesReducer,
+  tokenReducer,
 });
 
 export default createStore(mainReducer, applyMiddleware(thunk));

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import {
   Table,
   Button,
@@ -8,12 +9,12 @@ import {
   ModalFooter,
 } from 'reactstrap';
 import { shareFileGoogle } from '../actions/actionsGoogle';
-import { connect } from 'react-redux';
-import ListLinks from './listLinks.jsx';
+import { dropboxDownload } from '../libs/api';
+import ListLinks from './listLinks';
 
 class ListFiles extends Component {
-  constructor(props) {
-    super(props);
+  constructor() {
+    super();
     this.state = {
       modal: false,
       email: '',
@@ -22,6 +23,7 @@ class ListFiles extends Component {
     this.toggle = this.toggle.bind(this);
     this.handleInput = this.handleInput.bind(this);
     this.shareGoogle = this.shareGoogle.bind(this);
+    this.downloadDropbox = this.downloadDropbox.bind(this);
   }
 
   toggle() {
@@ -42,6 +44,10 @@ class ListFiles extends Component {
     this.props.shareFileGoogle(param);
   }
 
+  downloadDropbox = param => {
+    dropboxDownload(param);
+  };
+
   render() {
     const type = this.props.mimeType;
     const id = this.props.id;
@@ -58,17 +64,28 @@ class ListFiles extends Component {
         <tbody>
           <tr>
             <td>{this.props.name}</td>
+            {this.state.url === this.props.url ? (
+              <td>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => this.props.download(params)}
+                >
+                  Descargar
+                </button>
+              </td>
+            ) : (
+              <td>
+                <button
+                  className="btn btn-danger"
+                  onClick={() => this.downloadDropbox(params)}
+                >
+                  Descargar
+                </button>
+              </td>
+            )}
             <td>
               <button
                 className="btn btn-success"
-                onClick={() => this.props.download(params)}
-              >
-                Descargar
-              </button>
-            </td>
-            <td>
-              <button
-                className="btn btn-danger"
                 onClick={() => this.props.delete(params)}
               >
                 Eliminar
@@ -89,7 +106,7 @@ class ListFiles extends Component {
                       Compartir Archivo
                     </ModalHeader>
                     <ModalBody>
-                      <label>Email de la persona para compartir archivo</label>
+                      <p>Email de la persona para compartir archivo</p>
                       <input
                         type="text"
                         name="email"

@@ -11,7 +11,6 @@ import {
   googleDownload,
   googleNewToken,
   shareGoogle,
-  SaveAccessToken,
   GetToken,
   googleUpdateToken,
 } from '../libs/api';
@@ -32,446 +31,312 @@ const save = token => ({
   },
 });
 
-export const saveToken = token => {
-  return dispatch => {
-    SaveAccessToken(token);
-  };
-};
+let _id, token, access_token, param, refresh_token, id;
 
-export const getAccessToken = id => {
-  return dispatch => {
-    GetToken(id)
-      .then(res => {
-        console.log(res.status);
-        if (res.status !== 200) {
-          GetToken(id)
-            .then(res => {
-              console.log(res.status);
-              return res;
-            })
-            .then(response => {
-              return response.json();
-            })
-            .then(res => {
-              dispatch(save(res));
-              return res;
-            })
-            .then(response => {
-              googleGet(response.access_token)
-                .then(res => {
-                  console.log(res);
-                  if (res.status === 401) {
-                    googleNewToken(response.refresh_token)
-                      .then(res => {
-                        return res;
-                      })
-                      .then(res => {
-                        const access_token = res.access_token;
-                        const refresh_token = response.refresh_token;
-                        const _id = id;
-                        const token = { _id, access_token, refresh_token };
-                        googleUpdateToken(token)
-                          .then(res => {
-                            console.log('Modifica token en base de datos');
-                            console.log(res);
-                            const params = { access_token, refresh_token };
-                            dispatch(save(params));
-                          })
-                          .then(res => {
-                            googleGet(access_token)
-                              .then(res => {
-                                console.log(res.status);
-                                console.log('Obtiene archivos');
-                                return res;
-                              })
-                              .then(response => {
-                                return response.json();
-                              })
-                              .then(res => {
-                                dispatch(getFiles(res.files));
-                              })
-                              .catch(res => {
-                                console.log(res);
-                              });
-                          })
-                          .catch(function(error) {
-                            console.error(error);
-                          });
-                      })
-                      .catch(res => {
-                        console.log(res);
-                      });
-                  } else {
-                    return res;
-                  }
-                })
-                .then(response => {
-                  return response.json();
-                })
-                .then(res => {
-                  dispatch(getFiles(res.files));
-                })
-                .catch(res => {
-                  console.log(res);
-                });
-            })
-            .catch(res => {
-              console.log(res);
-            });
-        } else {
-          return res;
-        }
-      })
-      .then(response => {
-        return response.json();
-      })
-      .then(res => {
-        dispatch(save(res));
-        return res;
-      })
-      .then(response => {
-        googleGet(response.access_token)
-          .then(res => {
-            console.log(res);
-            if (res.status === 401) {
-              googleNewToken(response.refresh_token)
-                .then(res => {
-                  return res;
-                })
-                .then(res => {
-                  const access_token = res.access_token;
-                  const refresh_token = response.refresh_token;
-                  const _id = id;
-                  const token = { _id, access_token, refresh_token };
-                  googleUpdateToken(token)
-                    .then(res => {
-                      console.log('Modifica token en base de datos');
-                      console.log(res);
-                      const params = { access_token, refresh_token };
-                      dispatch(save(params));
-                    })
-                    .then(res => {
-                      googleGet(access_token)
-                        .then(res => {
-                          console.log(res.status);
-                          console.log('Obtiene archivos');
-                          return res;
-                        })
-                        .then(response => {
-                          return response.json();
-                        })
-                        .then(res => {
-                          dispatch(getFiles(res.files));
-                        })
-                        .catch(res => {
-                          console.log(res);
-                        });
-                    })
-                    .catch(function(error) {
-                      console.error(error);
-                    });
-                })
-                .catch(res => {
-                  console.log(res);
-                });
-            } else {
-              return res;
-            }
+export const getAccessToken = content => dispatch =>
+  GetToken(content)
+    .then(res => {
+      if (res.status !== 200) {
+        GetToken(content)
+          .then(res1 => {
+            console.log(res1.status);
+            return res1;
+          })
+          .then(res1 => res1.json())
+          .then(res1 => {
+            dispatch(save(res1));
+            return res1;
           })
           .then(response => {
-            return response.json();
+            googleGet(response.access_token)
+              .then(res1 => res1)
+              .then(res1 => res1.json())
+              .then(res1 => {
+                dispatch(getFiles(res1.files));
+              })
+              .catch(res1 => {
+                console.log(res1);
+              });
           })
-          .then(res => {
-            dispatch(getFiles(res.files));
-          })
-          .catch(res => {
-            console.log(res);
+          .catch(response => {
+            console.log(response);
           });
-      })
-      .catch(res => {
-        console.log(res);
-      });
-  };
-};
+      } else {
+        return res;
+      }
+      return false;
+    })
+    .then(response1 => response1.json())
+    .then(response1 => {
+      dispatch(save(response1));
+      return response1;
+    })
+    .then(response1 => {
+      googleGet(response1.access_token)
+        .then(res => {
+          if (res.status === 401) {
+            googleNewToken(response1.refresh_token)
+              .then(res1 => res1)
+              .then(res1 => {
+                access_token = res1.access_token;
+                refresh_token = response1.refresh_token;
+                _id = content;
+                token = { _id, access_token, refresh_token };
+                googleUpdateToken(token)
+                  .then(() => {
+                    param = { access_token, refresh_token };
+                    dispatch(save(param));
+                  })
+                  .then(() => {
+                    googleGet(access_token)
+                      .then(res3 => {
+                        console.log(res3.status);
+                        return res3;
+                      })
+                      .then(res3 => res3.json())
+                      .then(res3 => {
+                        dispatch(getFiles(res3.files));
+                      })
+                      .catch(res3 => {
+                        console.log(res3);
+                      });
+                  })
+                  .catch(error => {
+                    console.log(error);
+                  });
+              })
+              .catch(res1 => {
+                console.log(res1);
+              });
+          } else {
+            return res;
+          }
+          return false;
+        })
+        .then(res => res.json())
+        .then(res => {
+          dispatch(getFiles(res.files));
+        })
+        .catch(res => {
+          console.log(res);
+        });
+    })
+    .catch(res => {
+      console.log(res);
+    });
 
-export const deleteFilesGoogle = content => {
-  console.log(content);
-  return dispatch => {
-    googleDelete(content)
-      .then(function(response) {
-        if (response.status === 401) {
-          googleNewToken(content.refresh_token)
-            .then(res => {
-              console.log('Obtiene un nuevo token');
-              console.log(res);
-              return res;
-            })
-            .then(res => {
-              const access_token = res.access_token;
-              const refresh_token = content.refresh_token;
-              const _id = content.idclient;
-              const token = { _id, access_token, refresh_token };
-              googleUpdateToken(token)
-                .then(res => {
-                  console.log('Modifica token en base de datos');
-                  console.log(res);
-                  const params = { access_token, refresh_token };
-                  dispatch(save(params));
-                })
-                .then(res => {
-                  const id = content.id;
-                  const token = access_token;
-                  const param = { token, id };
-                  console.log(param);
-                  googleDelete(param)
-                    .then(res => {
-                      console.log(res.status);
-                      console.log('Elimina el archivo');
-                      return res;
-                    })
-                    .then(res => {
-                      return res.json();
-                    })
-                    .then(res => {
-                      console.log(res);
-                      dispatch(deleteFiles(content));
-                      console.log('Modifica el estado de redux');
-                    })
-                    .catch(res => {
-                      console.log(res);
-                    });
-                })
-                .catch(function(error) {
-                  console.error(error);
-                });
-            })
-            .catch(function(error) {
-              console.error(error);
-            });
-        } else {
-          return response;
-        }
-      })
-      .then(res => {
-        dispatch(deleteFiles(content));
-      })
-      .catch(res => {
-        console.log(res);
-      });
-  };
-};
+export const deleteFilesGoogle = content => dispatch =>
+  googleDelete(content)
+    .then(response => {
+      if (response.status === 401) {
+        googleNewToken(content.refresh_token)
+          .then(res1 => res1)
+          .then(res1 => {
+            access_token = res1.access_token;
+            refresh_token = content.refresh_token;
+            _id = content.idclient;
+            token = { _id, access_token, refresh_token };
+            googleUpdateToken(token)
+              .then(() => {
+                param = { access_token, refresh_token };
+                dispatch(save(param));
+              })
+              .then(() => {
+                id = content.id;
+                token = access_token;
+                param = { token, id };
+                googleDelete(param)
+                  .then(res3 => res3)
+                  .then(res3 => res3.json())
+                  .then(() => {
+                    dispatch(deleteFiles(content));
+                  })
+                  .catch(res3 => {
+                    console.log(res3);
+                  });
+              })
+              .catch(error => {
+                console.error(error);
+              });
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      } else {
+        return response;
+      }
+      return false;
+    })
+    .then(() => {
+      dispatch(deleteFiles(content));
+    })
+    .catch(res => {
+      console.log(res);
+    });
 
-export const uploadFilesGoogle = content => {
-  return dispatch => {
-    console.log(content.refresh_token);
-    googleUpload(content)
-      .then(function(response) {
-        console.log(response.status);
-        if (response.status !== 200) {
-          googleNewToken(content.refresh_token)
-            .then(res => {
-              console.log('Obtiene nuevo token');
-              console.log(res);
-              return res;
-            })
-            .then(res => {
-              const access_token = res.access_token;
-              const refresh_token = content.refresh_token;
-              const _id = content._id;
-              const token = { _id, access_token, refresh_token };
-              console.log(token);
-              googleUpdateToken(token)
-                .then(res => {
-                  console.log('Modifica token en base de datos');
-                  console.log(res);
-                  const params = { access_token, refresh_token };
-                  dispatch(save(params));
-                })
-                .then(res => {
-                  const file = content.file;
-                  const token = access_token;
-                  const param = { token, file };
-                  console.log(param);
-                  googleUpload(param)
-                    .then(res => {
-                      console.log(res.status);
-                      console.log('Sube el archivo');
-                      return res;
-                    })
-                    .then(res => {
-                      return res.json();
-                    })
-                    .then(res => {
-                      console.log(res);
-                      dispatch(uploadFiles(res));
-                      console.log('Modifica el estado de redux');
-                    })
-                    .catch(res => {
-                      console.log(res);
-                    });
-                })
-                .catch(function(error) {
-                  console.error(error);
-                });
-            })
-            .catch(function(error) {
-              console.error(error);
-            });
-        } else {
-          return response;
-        }
-      })
-      .then(res => {
-        return res.json();
-      })
-      .then(res => {
-        console.log(res);
-        dispatch(uploadFiles(res));
-      })
-      .catch(res => {
-        console.log(res);
-      });
-  };
-};
+export const uploadFilesGoogle = content => dispatch =>
+  googleUpload(content)
+    .then(response => {
+      console.log(response.status);
+      if (response.status !== 200) {
+        googleNewToken(content.refresh_token)
+          .then(res => res)
+          .then(res => {
+            access_token = res.access_token;
+            refresh_token = content.refresh_token;
+            _id = content.id;
+            token = { _id, access_token, refresh_token };
+            googleUpdateToken(token)
+              .then(() => {
+                param = { access_token, refresh_token };
+                dispatch(save(param));
+              })
+              .then(() => {
+                const file = content.file;
+                token = access_token;
+                param = { token, file };
+                googleUpload(param)
+                  .then(res2 => {
+                    console.log(res2.status);
+                    return res2;
+                  })
+                  .then(res2 => res2.json())
+                  .then(res2 => {
+                    dispatch(uploadFiles(res2));
+                  })
+                  .catch(res2 => {
+                    console.log(res2);
+                  });
+              })
+              .catch(error => {
+                console.log(error);
+              });
+          })
+          .catch(error => {
+            console.log(error);
+          });
+      } else {
+        return response;
+      }
+      return false;
+    })
+    .then(res => res.json())
+    .then(res => {
+      dispatch(uploadFiles(res));
+    })
+    .catch(res => {
+      console.log(res);
+    });
 
-export const downloadFilesGoogle = content => {
-  console.log(content);
-  return dispatch => {
-    googleDownload(content)
-      .then(response => {
-        if (response.status === 401) {
-          googleNewToken(content.refresh_token)
-            .then(res => {
-              console.log(res);
-              return res;
-            })
-            .then(res => {
-              const access_token = res.access_token;
-              const refresh_token = content.refresh_token;
-              const _id = content.idclient;
-              const token = { _id, access_token, refresh_token };
-              console.log(token);
-              googleUpdateToken(token)
-                .then(res => {
-                  console.log('Modifica token en base de datos');
-                  console.log(res);
-                  const params = { access_token, refresh_token };
-                  dispatch(save(params));
-                })
-                .then(res => {
-                  const id = content.id;
-                  const token = access_token;
-                  const param = { token, id };
-                  console.log(param);
-                  googleDownload(param)
-                    .then(res => {
-                      console.log(res.status);
-                      console.log('Va a descargar el archivo');
-                      return res;
-                    })
-                    .then(response => response.blob())
-                    .then(blob => {
-                      const url = window.URL.createObjectURL(new Blob([blob]));
-                      const link = document.createElement('a');
-                      link.href = url;
-                      link.setAttribute('download', `${content.id}.pdf`);
-                      document.body.appendChild(link);
-                      link.click();
-                      link.parentNode.removeChild(link);
-                      console.log(link);
-                    })
-                    .catch(res => {
-                      console.log(res);
-                    });
-                })
-                .catch(function(error) {
-                  console.error(error);
-                });
-            })
-            .catch(function(error) {
-              console.error(error);
-            });
-        } else {
-          return response;
-        }
-      })
-      .then(response => response.blob())
-      .then(blob => {
-        const url = window.URL.createObjectURL(new Blob([blob]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', `${content.id}.pdf`);
-        document.body.appendChild(link);
-        link.click();
-        link.parentNode.removeChild(link);
-        console.log(link);
-      })
-      .catch(res => {
-        console.log(res);
-      });
-  };
-};
+export const downloadFilesGoogle = content => dispatch =>
+  googleDownload(content)
+    .then(response => {
+      if (response.status === 401) {
+        googleNewToken(content.refresh_token)
+          .then(res => res)
+          .then(res => {
+            access_token = res.access_token;
+            refresh_token = content.refresh_token;
+            _id = content.idclient;
+            token = { _id, access_token, refresh_token };
+            googleUpdateToken(token)
+              .then(() => {
+                param = { access_token, refresh_token };
+                dispatch(save(param));
+              })
+              .then(() => {
+                id = content.id;
+                token = access_token;
+                param = { token, id };
+                googleDownload(param)
+                  .then(res3 => {
+                    console.log(res3.status);
+                    return res3;
+                  })
+                  .then(res3 => res3.blob())
+                  .then(blob => {
+                    const url = window.URL.createObjectURL(new Blob([blob]));
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.setAttribute('download', `${content.id}.pdf`);
+                    document.body.appendChild(link);
+                    link.click();
+                    link.parentNode.removeChild(link);
+                  })
+                  .catch(res3 => {
+                    console.log(res3);
+                  });
+              })
+              .catch(error => {
+                console.error(error);
+              });
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      } else {
+        return response;
+      }
+      return false;
+    })
+    .then(response => response.blob())
+    .then(blob => {
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `${content.id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    })
+    .catch(res => {
+      console.log(res);
+    });
 
-export const shareFileGoogle = params => {
-  return dispatch => {
-    shareGoogle(params)
-      .then(function(response) {
-        if (response.status === 401) {
-          googleNewToken(params.refresh_token)
-            .then(res => {
-              console.log(res);
-              return res;
-            })
-            .then(res => {
-              const access_token = res.access_token;
-              const refresh_token = params.refresh_token;
-              const _id = params.idclient;
-              const token = { _id, access_token, refresh_token };
-              console.log(token);
-              googleUpdateToken(token)
-                .then(res => {
-                  console.log('Modifica token en base de datos');
-                  console.log(res);
-                  const params = { access_token, refresh_token };
-                  dispatch(save(params));
-                })
-                .then(res => {
-                  const id = params.id;
-                  const email = params.email;
-                  const token = access_token;
-                  const param = { token, id, email };
-                  console.log(param);
-                  shareGoogle(param)
-                    .then(res => {
-                      console.log(res.status);
-                      console.log('Elimina el archivo');
-                      return res;
-                    })
-                    .then(res => {
-                      return res.json();
-                    })
-                    .then(res => {
-                      console.log(res);
-                      console.log('Se ha compartido exitosamente');
-                    })
-                    .catch(res => {
-                      console.log(res);
-                    });
-                })
-                .catch(function(error) {
-                  console.error(error);
-                });
-            })
-            .catch(function(error) {
-              console.error(error);
-            });
-        } else {
-          return alert('Se compartio correctamente');
-        }
-      })
-      .catch(res => {
-        console.log(res);
-      });
-  };
+export const shareFileGoogle = params => dispatch => {
+  refresh_token = params.refresh_token;
+  _id = params.idclient;
+  id = params.id;
+  const email = params.email;
+  shareGoogle(params)
+    .then(response => {
+      if (response.status === 401) {
+        googleNewToken(refresh_token)
+          .then(res => res)
+          .then(res => {
+            access_token = res.access_token;
+            token = { _id, access_token, refresh_token };
+            googleUpdateToken(token)
+              .then(() => {
+                param = { access_token, refresh_token };
+                dispatch(save(param));
+              })
+              .then(() => {
+                token = access_token;
+                param = { token, id, email };
+                shareGoogle(param)
+                  .then(res3 => {
+                    console.log(res3.status);
+                    return res3;
+                  })
+                  .then(res3 => res3.json())
+                  .catch(res3 => {
+                    console.log(res3);
+                  });
+              })
+              .catch(error => {
+                console.error(error);
+              });
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      } else {
+        return alert('Se compartio correctamente');
+      }
+      return false;
+    })
+    .catch(res => {
+      console.error(res);
+    });
 };
-

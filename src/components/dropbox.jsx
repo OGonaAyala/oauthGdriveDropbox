@@ -1,46 +1,25 @@
 import React, { Component } from 'react';
-import '../App.css';
-import ListFiles from '../components/listFiles.jsx';
 import { connect } from 'react-redux';
+import '../App.css';
+import ListFiles from '../components/listFiles';
 import {
   getFilesDropbox,
   deleteFilesDropbox,
-  downloadFilesDropbox,
   uploadFileDropbox,
   shareLinkDropbox,
   getAccessTokenDropbox,
-} from '../actions/actions';
+} from '../actions/actionsDropbox';
+import { getTokenFromURL } from '../libs/api';
 import store from '../redux/store';
 
 class Dropbox extends Component {
-   getTokenFromURL(str) {
-    var ret = Object.create(null);
-    if (typeof str !== 'string') {
-      return ret;
-    }
-    str = str.trim().replace(/^(\?|#|&)/, '');
-    if (!str) {
-      return ret;
-    }
-    str.split('&').forEach(function(param) {
-      var parts = param.replace(/\+/g, ' ').split('=');
-      var key = parts.shift();
-      var val = parts.length > 0 ? parts.join('=') : undefined;
-      key = decodeURIComponent(key);
-      val = val === undefined ? null : decodeURIComponent(val);
-      if (ret[key] === undefined) {
-        ret[key] = val;
-      } else if (Array.isArray(ret[key])) {
-        ret[key].push(val);
-      } else {
-        ret[key] = [ret[key], val];
-      }
-    });
-    return ret;
+  constructor() {
+    super();
+    this.uploadFile = this.uploadFile.bind(this);
   }
 
   componentWillMount() {
-    const client_id = this.getTokenFromURL(window.location.hash).id_cliente;
+    const client_id = getTokenFromURL(window.location.hash).id_cliente;
     this.props.getAccessTokenDropbox(client_id);
   }
 
@@ -50,14 +29,17 @@ class Dropbox extends Component {
     const file = fileInput.files[0];
     const token = general.tokenReducer.token.access_token;
     const data = { file, token };
-    this.props.uploadFileDropbox(data);
+    if (data.file) {
+      this.props.uploadFileDropbox(data);
+    }
+    return false;
   }
 
   render() {
     const files = this.props.files;
     return (
       <div className="App">
-        <h2>Files</h2>
+        <h2>Archivos</h2>
         <div>
           {files.map(file => (
             <ListFiles
@@ -65,7 +47,6 @@ class Dropbox extends Component {
               token={this.props.tokens.access_token}
               {...file}
               delete={this.props.deleteFilesDropbox}
-              download={this.props.downloadFilesDropbox}
               share={this.props.shareLinkDropbox}
               url={window.location.pathname}
             />
@@ -73,9 +54,9 @@ class Dropbox extends Component {
         </div>
         <div>
           <h2>Subir archivo</h2>
-          <form onSubmit={this.uploadFile.bind(this)}>
+          <form onSubmit={this.uploadFile}>
             <input type="file" id="file-upload" />
-            <button type="submit">Submit</button>
+            <button type="submit">Subir</button>
           </form>
         </div>
       </div>
@@ -91,7 +72,6 @@ export default connect(
   {
     getFilesDropbox,
     deleteFilesDropbox,
-    downloadFilesDropbox,
     uploadFileDropbox,
     shareLinkDropbox,
     getAccessTokenDropbox,

@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Google from './components/google.jsx';
-import Dropbox from './components/dropbox.jsx';
-import Success from './components/oauthSuccess';
-import App from './App.js';
-import { Route, Switch, BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
+import { Route, Switch, BrowserRouter } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import Google from './components/google';
+import Dropbox from './components/dropbox';
+import Success from './components/oauthSuccess';
+import App from './App';
 import store from './redux/store';
 import * as serviceWorker from './serviceWorker';
 

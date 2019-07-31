@@ -1,3 +1,29 @@
+export const getTokenFromURL = str => {
+  const ret = Object.create(null);
+  if (typeof str !== 'string') {
+    return ret;
+  }
+  str = str.trim().replace(/^(\?|#|&)/, '');
+  if (!str) {
+    return ret;
+  }
+  str.split('&').forEach(param => {
+    const parts = param.replace(/\+/g, ' ').split('=');
+    let key = parts.shift();
+    let val = parts.length > 0 ? parts.join('=') : '';
+    key = decodeURIComponent(key);
+    val = val ? decodeURIComponent(val) : null;
+    if (!ret[key]) {
+      ret[key] = val;
+    } else if (Array.isArray(ret[key])) {
+      ret[key].push(val);
+    } else {
+      ret[key] = [ret[key], val];
+    }
+  });
+  return ret;
+};
+
 export const SaveAccessToken = token => {
   const url =
     'https://api.mlab.com/api/1/databases/tokens_omar/collections/tokensUser?apiKey=7N0hJ19t7vyboGPojW8evejTxlwizS-i';
@@ -12,10 +38,7 @@ export const SaveAccessToken = token => {
 };
 
 export const googleUpdateToken = token => {
-  console.log(token._id);
-  const url = `https://api.mlab.com/api/1/databases/tokens_omar/collections/tokensUser/${
-    token._id
-  }?apiKey=7N0hJ19t7vyboGPojW8evejTxlwizS-i`;
+  const url = `https://api.mlab.com/api/1/databases/tokens_omar/collections/tokensUser/${token._id}?apiKey=7N0hJ19t7vyboGPojW8evejTxlwizS-i`;
   const request = {
     method: 'PUT',
     body: JSON.stringify({
@@ -57,7 +80,6 @@ export const googleDelete = id => {
 };
 
 export const googleUpload = data => {
-  console.log(data.token);
   const url =
     'https://www.googleapis.com/upload/drive/v3/files?uploadType=media';
   const request = {
@@ -74,7 +96,6 @@ export const googleUpload = data => {
 
 export const googleDownload = id => {
   const url = `https://www.googleapis.com/drive/v3/files/${id.id}?alt=media`;
-  console.log(url);
   const request = {
     method: 'GET',
     headers: {
@@ -114,7 +135,7 @@ export const dropboxDelete = id => {
 
 export const dropboxDownload = id => {
   const data = { path: `/Imagenes/${id.name}` };
-  const url = 'https://content.dropboxapi.com/2/files/download';
+  let url = 'https://content.dropboxapi.com/2/files/download';
   const request = {
     method: 'POST',
     headers: {
@@ -122,7 +143,20 @@ export const dropboxDownload = id => {
       'Dropbox-API-Arg': JSON.stringify(data),
     },
   };
-  return fetch(url, request);
+  fetch(url, request)
+    .then(response => response.blob())
+    .then(blob => {
+      url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', id.name);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+    })
+    .catch(res => {
+      console.log(res);
+    });
 };
 
 export const shareDropbox = params => {
@@ -145,9 +179,7 @@ export const shareGoogle = params => {
   const type = 'user';
   const emailAddress = params.email;
   const data = { role, type, emailAddress };
-  const url = `https://www.googleapis.com/drive/v3/files/${
-    params.id
-  }/permissions`;
+  const url = `https://www.googleapis.com/drive/v3/files/${params.id}/permissions`;
   const request = {
     method: 'POST',
     headers: {
