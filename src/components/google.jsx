@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Alert } from 'reactstrap';
 import '../App.css';
 import ListFiles from '../components/listFiles';
 import {
@@ -15,8 +16,8 @@ class Google extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      modal: false,
       id: '',
+      alert: '',
     };
     this.uploadFile = this.uploadFile.bind(this);
   }
@@ -38,7 +39,14 @@ class Google extends Component {
     const id = this.state.id;
     const data = { file, token, id, refresh_token };
     if (data.file) {
+      this.setState({
+        alert: false,
+      });
       this.props.uploadFilesGoogle(data);
+    } else {
+      this.setState({
+        alert: true,
+      });
     }
     return false;
   }
@@ -63,6 +71,13 @@ class Google extends Component {
           ))}
         </div>
         <div>
+          {this.state.alert === true ? (
+            <div>
+              <Alert color="danger">Debes seleccionar un archivo</Alert>
+            </div>
+          ) : (
+            <p></p>
+          )}
           <h2>Subir archivo</h2>
           <form onSubmit={this.uploadFile}>
             <input type="file" id="file-upload" />

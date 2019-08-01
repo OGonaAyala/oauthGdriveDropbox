@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Alert } from 'reactstrap';
 import '../App.css';
 import ListFiles from '../components/listFiles';
 import {
@@ -15,6 +16,9 @@ import store from '../redux/store';
 class Dropbox extends Component {
   constructor() {
     super();
+    this.state = {
+      alert: '',
+    };
     this.uploadFile = this.uploadFile.bind(this);
   }
 
@@ -30,7 +34,14 @@ class Dropbox extends Component {
     const token = general.tokenReducer.token.access_token;
     const data = { file, token };
     if (data.file) {
+      this.setState({
+        alert: false,
+      });
       this.props.uploadFileDropbox(data);
+    } else {
+      this.setState({
+        alert: true,
+      });
     }
     return false;
   }
@@ -53,6 +64,14 @@ class Dropbox extends Component {
           ))}
         </div>
         <div>
+          {this.state.alert === true ? (
+            <div>
+              <Alert color="danger">Debes seleccionar un archivo</Alert>
+            </div>
+          ) : (
+            <p></p>
+          )}
+
           <h2>Subir archivo</h2>
           <form onSubmit={this.uploadFile}>
             <input type="file" id="file-upload" />
